@@ -6,6 +6,9 @@ public class ParryCollider : MonoBehaviour
 {
     StateManager states;
     EnemyStates eStates;
+
+    public float maxTimer = 0.6f;
+    float timer;
     public void InitPlayer(StateManager st)
     {
         states = st;
@@ -14,6 +17,30 @@ public class ParryCollider : MonoBehaviour
     public void InitEnemy(EnemyStates st)
     {
         eStates = st;
+    }
+
+    private void Update()
+    {
+        if(states)
+        {
+            timer += states.delta;
+
+            if(timer > maxTimer)
+            {
+                timer = 0;
+                gameObject.SetActive(false);
+            }
+        }
+        if(eStates)
+        {
+            timer += eStates.delta;
+
+            if (timer > maxTimer)
+            {
+                timer = 0;
+                gameObject.SetActive(false);
+            }
+        }
     }
 
     private void OnTriggerEnter(Collider other)

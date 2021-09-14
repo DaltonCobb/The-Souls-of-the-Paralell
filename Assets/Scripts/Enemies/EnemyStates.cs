@@ -13,7 +13,7 @@ public class EnemyStates : MonoBehaviour
     public bool canMove;
     public bool isDead;
 
-    StateManager parredBy;
+    public StateManager parriedBy;
 
     public Animator anim;
     EnemyTarget enTarget;
@@ -107,10 +107,10 @@ public class EnemyStates : MonoBehaviour
             isInvicible = !canMove;
         }
 
-        if(parredBy != null && parryIsOn == false)
+        if(parriedBy != null && parryIsOn == false)
         {
-            parredBy.parryTarget = null;
-            parredBy = null;
+            //parredBy.parryTarget = null;
+            parriedBy = null;
         }
 
         if(canMove)
@@ -162,8 +162,8 @@ public class EnemyStates : MonoBehaviour
         anim.Play("attack_interrupt");
         anim.applyRootMotion = true;
         anim.SetBool("canMove", false);
-        states.parryTarget = this;
-        parredBy = states;
+       // states.parryTarget = this;
+        parriedBy = states;
         return;
     }
 

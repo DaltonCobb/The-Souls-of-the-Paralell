@@ -41,7 +41,7 @@ public class StateManager : MonoBehaviour
     public EnemyTarget lockonTarget;
     public Transform lockOnTransform;
     public AnimationCurve roll_curve;
-    public EnemyStates parryTarget;
+    //public EnemyStates parryTarget;
 
     [HideInInspector]
     public Animator anim;
@@ -235,6 +235,10 @@ public class StateManager : MonoBehaviour
     {
         if (CheckForParry(slot))
             return;
+
+        if (CheckForBackstab(slot))
+            return;
+
         string targetAnim = null;
         targetAnim = slot.targetAnim;
 
@@ -243,19 +247,42 @@ public class StateManager : MonoBehaviour
 
         canMove = false;
         inAction = true;
+
+        float targetSpeed = 1;
+        if (slot.changeSpeed)
+        {
+            targetSpeed = slot.animSpeed;
+            if (targetSpeed == 0)
+                targetSpeed = 1;
+        }
+        canBeParried = slot.canBeParried;
+        anim.SetFloat("animSpeed", targetSpeed);
         anim.SetBool("mirror", slot.mirror);
         anim.CrossFade(targetAnim, 0.2f);
     }
 
     bool CheckForParry(Action slot)
     {
+        EnemyStates parryTarget = null;
+        Vector3 origin = transform.position;
+        origin.y += 1;
+        Vector3 rayDir = transform.forward;
+        RaycastHit hit;
+        if(Physics.Raycast(origin,rayDir, out hit, 3, ignoreLayers))
+        {
+            parryTarget = hit.transform.GetComponentInParent<EnemyStates>();
+        }
+
         if (parryTarget == null)
             return false;
 
-        float dis = Vector3.Distance(parryTarget.transform.position, transform.position);
-
-        if (dis > 3)
+        if (parryTarget.parriedBy == null)
             return false;
+
+      //  float dis = Vector3.Distance(parryTarget.transform.position, transform.position);
+
+        //if (dis > 3)
+          //  return false;
 
         Vector3 dir = parryTarget.transform.position - transform.position;
         dir.Normalize();
@@ -287,6 +314,49 @@ public class StateManager : MonoBehaviour
 
         return false;
     }
+
+    bool CheckForBackstab(Action slot)
+    {
+        if (slot.canBackStab == false)
+            return false;
+
+        EnemyStates backstab = null;
+        Vector3 origin = transform.position;
+        origin.y += 1;
+        Vector3 rayDir = transform.forward;
+        RaycastHit hit;
+        if(Physics.Raycast(origin, rayDir, out hit, 1,ignoreLayers))
+        {
+            backstab = hit.transform.GetComponentInParent<EnemyStates>();
+        }
+
+        if (backstab == null)
+            return false;
+
+        Vector3 dir = transform.position - backstab.transform.position;
+        dir.Normalize();
+        dir.y = 0;
+        float angle = Vector3.Angle(backstab.transform.forward, dir);
+
+        Debug.Log("f");
+
+        if (angle > 150)
+        {
+            Vector3 targetPosition = dir * parryOffset;
+            targetPosition += backstab.transform.position;
+            transform.position = targetPosition;
+
+            backstab.transform.rotation = transform.rotation;
+            backstab.IsGettingParried();
+            canMove = false;
+            inAction = true;
+            anim.SetBool("mirror", slot.mirror);
+            anim.CrossFade("parry_attack", 0.2f);
+
+            return true;
+        }
+        return false;
+    }
     void BlockAction(Action slot)
     {
         isBlocking = true;
@@ -301,7 +371,15 @@ public class StateManager : MonoBehaviour
         if (string.IsNullOrEmpty(targetAnim))
             return;
 
-        canBeParried = slot.canBeParried;
+        float targetSpeed = 1;
+        if (slot.changeSpeed)
+        {
+            targetSpeed = slot.animSpeed;
+            if (targetSpeed == 0)
+                targetSpeed = 1;
+        }
+
+        anim.SetFloat("animSpeed", targetSpeed);
         canMove = false;
         inAction = true;
         anim.SetBool("mirror", slot.mirror);
