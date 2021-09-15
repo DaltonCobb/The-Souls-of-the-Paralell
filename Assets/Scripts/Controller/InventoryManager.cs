@@ -30,6 +30,11 @@ public class InventoryManager : MonoBehaviour
         states.anim.SetBool("mirror", isLeft);
         states.anim.Play("changeWeapon");
         states.anim.Play(targetIdle);
+
+        QuickSlot uiSlot = QuickSlot.singleton;
+        uiSlot.UpdateSlot((isLeft) ? QSlotType.lh : QSlotType.rh, w.icon);
+
+       
     }
 
     public void OpenAllDamageColliders()
@@ -62,6 +67,8 @@ public class InventoryManager : MonoBehaviour
 [System.Serializable]
 public class Weapon
 {
+    public string weaponIs;
+    public Sprite icon;
     public string oh_idle;
     public string th_idle;
 

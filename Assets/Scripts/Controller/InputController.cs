@@ -31,6 +31,8 @@ public class InputController : MonoBehaviour
     CameraManager camManager;
     void Start()
     {
+        QuickSlot.singleton.Init();
+
         states = GetComponent<StateManager>();
         states.Init();
 
