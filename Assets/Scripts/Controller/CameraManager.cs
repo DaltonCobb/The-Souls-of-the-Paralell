@@ -31,6 +31,9 @@ public class CameraManager : MonoBehaviour
     public float tiltAngle;
 
     bool usedRightAxis;
+
+    bool changeTargetLeft;
+    bool changeTargetRight;
     public void Init(StateManager st)
     {
         states = st;
@@ -50,7 +53,10 @@ public class CameraManager : MonoBehaviour
         float c_v = Input.GetAxis("RightAxis Y");
 
         float targetSpeed = mouseSpeed;
-        
+
+        changeTargetLeft = Input.GetKeyUp(KeyCode.V);
+        changeTargetRight = Input.GetKeyUp(KeyCode.B);
+
         if(lockOnTarget != null)
         {
             if(lockonTransform == null)
@@ -68,6 +74,12 @@ public class CameraManager : MonoBehaviour
                     usedRightAxis = true;
                 }
             }    
+
+            if(changeTargetLeft || changeTargetRight)
+            {
+                lockonTransform = lockOnTarget.GetTarget(changeTargetLeft);
+                states.lockOnTransform = lockonTransform;
+            }
         }
         if(usedRightAxis)
         {

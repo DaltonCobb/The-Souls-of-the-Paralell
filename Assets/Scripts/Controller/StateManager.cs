@@ -7,6 +7,10 @@ public class StateManager : MonoBehaviour
     [Header("Init")]
     public GameObject activeModel;
 
+    [Header("Stats")]
+    public Attributes attributes;
+    public CharacterStats characterStats;
+
     [Header("Inputs")]
     public float vertical;
     public float horizontal;
@@ -23,6 +27,7 @@ public class StateManager : MonoBehaviour
     public float toGround = 0.5f;
     public float rollSpeed = 1;
     public float parryOffset = 1.4f;
+    public float backStabOffset = 1.4f;
 
     [Header("States")]
     public bool onGround;
@@ -58,6 +63,9 @@ public class StateManager : MonoBehaviour
     public float delta;
     [HideInInspector]
     public LayerMask ignoreLayers;
+
+    [HideInInspector]
+    public Action currentAtcion;
 
     float _actionDelay;
 
@@ -245,6 +253,8 @@ public class StateManager : MonoBehaviour
         if (string.IsNullOrEmpty(targetAnim))
             return;
 
+
+        currentAtcion = slot;
         canMove = false;
         inAction = true;
 
@@ -256,8 +266,8 @@ public class StateManager : MonoBehaviour
                 targetSpeed = 1;
         }
         canBeParried = slot.canBeParried;
-        anim.SetFloat("animSpeed", targetSpeed);
-        anim.SetBool("mirror", slot.mirror);
+        anim.SetFloat(StaticStrings.animSpeed, targetSpeed);
+        anim.SetBool(StaticStrings.mirror, slot.mirror);
         anim.CrossFade(targetAnim, 0.2f);
     }
 
@@ -306,9 +316,9 @@ public class StateManager : MonoBehaviour
             parryTarget.IsGettingParried();
             canMove = false; 
             inAction = true;
-            anim.SetBool("mirror", slot.mirror);
-            anim.CrossFade("parry_attack", 0.2f);
-
+            anim.SetBool(StaticStrings.mirror, slot.mirror);
+            anim.CrossFade(StaticStrings.parry_attack, 0.2f);
+            lockonTarget = null;
             return true;
         }
 
@@ -338,21 +348,19 @@ public class StateManager : MonoBehaviour
         dir.y = 0;
         float angle = Vector3.Angle(backstab.transform.forward, dir);
 
-        Debug.Log("f");
-
-        if (angle > 150)
+        if (angle < 150)
         {
-            Vector3 targetPosition = dir * parryOffset;
+            Vector3 targetPosition = dir * backStabOffset;
             targetPosition += backstab.transform.position;
             transform.position = targetPosition;
 
             backstab.transform.rotation = transform.rotation;
-            backstab.IsGettingParried();
+            backstab.IsGettingBackstabbed();
             canMove = false;
             inAction = true;
-            anim.SetBool("mirror", slot.mirror);
-            anim.CrossFade("parry_attack", 0.2f);
-
+            anim.SetBool(StaticStrings.mirror, slot.mirror);
+            anim.CrossFade(StaticStrings.parry_attack, 0.2f);
+            lockonTarget = null;
             return true;
         }
         return false;
@@ -379,10 +387,10 @@ public class StateManager : MonoBehaviour
                 targetSpeed = 1;
         }
 
-        anim.SetFloat("animSpeed", targetSpeed);
+        anim.SetFloat(StaticStrings.animSpeed, targetSpeed);
         canMove = false;
         inAction = true;
-        anim.SetBool("mirror", slot.mirror);
+        anim.SetBool(StaticStrings.mirror, slot.mirror);
         anim.CrossFade(targetAnim, 0.2f);
     }
     public void Tick(float d)
@@ -390,7 +398,7 @@ public class StateManager : MonoBehaviour
         delta = d;
         onGround = OnGround();
 
-        anim.SetBool("onGround", onGround);
+        anim.SetBool(StaticStrings.onGround, onGround);
     }
 
     void HandleRolls()
@@ -430,18 +438,18 @@ public class StateManager : MonoBehaviour
             a_hook.rm_multi = 1.3f;
         }
 
-        anim.SetFloat("vertical", v);
-        anim.SetFloat("horizontal", h);
+        anim.SetFloat(StaticStrings.vertical, v);
+        anim.SetFloat(StaticStrings.horizontal, h);
 
         canMove = false;
         inAction = true;
-        anim.CrossFade("Rolls", 0.2f);
+        anim.CrossFade(StaticStrings.Rolls, 0.2f);
     }
 
     void HandleMovmentAnimations()
     {
-        anim.SetBool("run", run);
-        anim.SetFloat("vertical", moveAmount, 0.4f, delta);
+        anim.SetBool(StaticStrings.run, run);
+        anim.SetFloat(StaticStrings.vertical, moveAmount, 0.4f, delta);
     }
 
     void HandleLockOnAnimations(Vector3 moveDir)
@@ -450,8 +458,8 @@ public class StateManager : MonoBehaviour
         float h = relativeDir.x;
         float v = relativeDir.z;
 
-        anim.SetFloat("vertical", v, .2f, delta);
-        anim.SetFloat("horizontal", h, .2f, delta);
+        anim.SetFloat(StaticStrings.vertical, v, .2f, delta);
+        anim.SetFloat(StaticStrings.horizontal, h, .2f, delta);
 
     }
 
@@ -476,7 +484,7 @@ public class StateManager : MonoBehaviour
 
     public void HandleTwoHanded()
     {
-        anim.SetBool("two_handed", isTwoHanded);
+        anim.SetBool(StaticStrings.two_handed, isTwoHanded);
 
         if (isTwoHanded)
             actionManager.UpdateActionTwoHanded();

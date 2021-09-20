@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class EnemyStates : MonoBehaviour
 {
-    public float health;
+    public int health;
+
+    public CharacterStats characterStats;
+
     public bool canBeParried = true;
     public bool parryIsOn = true;
    // public bool doParry = false;
@@ -20,6 +23,7 @@ public class EnemyStates : MonoBehaviour
     AnimatorHook a_hook;
     public Rigidbody rigid;
     public float delta;
+    public float poiseDegrade = 2;
 
     List<Rigidbody> ragdollRigds = new List<Rigidbody>();
     List<Collider> ragdollColliders = new List<Collider>();
@@ -28,7 +32,7 @@ public class EnemyStates : MonoBehaviour
 
     private void Start()
     {
-        health = 100;
+        health = 100000;
         anim = GetComponentInChildren<Animator>();
         enTarget = GetComponent<EnemyTarget>();
         enTarget.Init(this);
@@ -84,7 +88,7 @@ public class EnemyStates : MonoBehaviour
     private void Update()
     {
         delta = Time.deltaTime;
-        canMove = anim.GetBool("canMove");
+        canMove = anim.GetBool(StaticStrings.canMove);
 
         if(dontDoAnything)
         {
@@ -126,25 +130,45 @@ public class EnemyStates : MonoBehaviour
                 timer = 0; 
             }
         }
+
+        characterStats.poise -= delta * poiseDegrade;
+        if (characterStats.poise < 0)
+            characterStats.poise = 0;
     }
 
     void DoAction()
     {
         anim.Play("oh_attack_1");
         anim.applyRootMotion = true;
-        anim.SetBool("canMove", false);
+        anim.SetBool(StaticStrings.canMove, false);
     }
 
-    public void DoDamage(float v)
+    public void DoDamage(Action a)
     {
         if (isInvicible)
             return;
 
-        health -= v;
+        int damage = StatsCalculations.CalculateBaseDamage(a.weaponStats, characterStats);
+
+        characterStats.poise += damage;
+        health -= damage;
+
+        if(canMove || characterStats.poise > 100)
+        {
+            if (a.overideDamageAnim)
+                anim.Play(a.damageAnim);
+            else
+            {
+                int ran = Random.Range(0, 100);
+                string tA = (ran > 50) ? StaticStrings.damage1 : StaticStrings.damage2;
+                anim.Play(tA);
+            }
+        }
+        Debug.Log("Damage is " + damage + " Poise is " + characterStats.poise);
+
         isInvicible = true;
-        anim.Play("damage_1");
         anim.applyRootMotion = true;
-        anim.SetBool("canMove", false);
+        anim.SetBool(StaticStrings.canMove, false);
     }
 
     public void CheckForParry(Transform target, StateManager states)
@@ -159,9 +183,9 @@ public class EnemyStates : MonoBehaviour
             return;
 
         isInvicible = true;
-        anim.Play("attack_interrupt");
+        anim.Play(StaticStrings.attack_interrupt);
         anim.applyRootMotion = true;
-        anim.SetBool("canMove", false);
+        anim.SetBool(StaticStrings.canMove, false);
        // states.parryTarget = this;
         parriedBy = states;
         return;
@@ -171,7 +195,15 @@ public class EnemyStates : MonoBehaviour
     {
         health -= 500;
         dontDoAnything = true;
-        anim.SetBool("canMove", false);
-        anim.Play("parry_recieved");
+        anim.SetBool(StaticStrings.canMove, false);
+        anim.Play(StaticStrings.parry_received);
+    }
+
+    public void IsGettingBackstabbed()
+    {
+        health -= 500;
+        dontDoAnything = true;
+        anim.SetBool(StaticStrings.canMove, false);
+        anim.Play(StaticStrings.backstabbed);
     }
 }

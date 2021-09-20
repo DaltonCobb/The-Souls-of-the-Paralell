@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class DamageColider : MonoBehaviour
 {
+    StateManager states;
+
+    public void Init(StateManager st)
+    {
+        states = st;
+    }
     private void OnTriggerEnter(Collider other)
     {
         EnemyStates eStates = other.transform.GetComponentInParent<EnemyStates>();
@@ -11,7 +17,6 @@ public class DamageColider : MonoBehaviour
         if (eStates == null)
             return;
 
-        //do damage
-        eStates.DoDamage(45);
+        eStates.DoDamage(states.currentAtcion);
     }
 }
