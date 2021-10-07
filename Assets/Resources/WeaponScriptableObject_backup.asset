@@ -1,0 +1,132 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91a3800c8f41f574ba451c24147afbe5, type: 3}
+  m_Name: WeaponScriptableObject_backup
+  m_EditorClassIdentifier: 
+  weapons_all:
+  - itemName: sword
+    itemDescription: 
+    icon: {fileID: 21300000, guid: 17e690b94a5d4a341af142bf34d496fe, type: 3}
+    oh_idle: oh_idle
+    th_idle: th_idle
+    actions:
+    - input: 0
+      type: 0
+      spellClass: 0
+      targetAnim: oh_attack_1
+      mirror: 0
+      canBeParried: 0
+      changeSpeed: 0
+      animSpeed: 0
+      canParry: 0
+      canBackStab: 0
+      parryMultiplier: 0
+      backstabMultiplier: 0
+      overideDamageAnim: 0
+      damageAnim: 
+      weaponStats:
+        physical: 0
+        strike: 0
+        slash: 0
+        thrust: 0
+        magic: 0
+        fire: 0
+        lighting: 0
+        dark: 0
+    two_handedActions: []
+    parryMultiplier: 0
+    backstabMultiplier: 0
+    LeftHandMirror: 1
+    modelPrefab: {fileID: 7530080860619478933, guid: 8a5917f4d98be0c4eb4b1c7b18f12caf, type: 3}
+    r_model_pos: {x: 0, y: 0, z: 0}
+    l_model_pos: {x: 0, y: 0, z: 0}
+    r_model_eulers: {x: 0, y: 0, z: 0}
+    l_model_eulers: {x: 0, y: 0, z: 0}
+    model_scale: {x: 1, y: 1, z: 1}
+  - itemName: Round Shield
+    itemDescription: 
+    icon: {fileID: 21300000, guid: 7eb80c482538ae344a9238963ae31cd4, type: 3}
+    oh_idle: oh_idle
+    th_idle: th_idle
+    actions:
+    - input: 0
+      type: 1
+      spellClass: 0
+      targetAnim: 
+      mirror: 0
+      canBeParried: 0
+      changeSpeed: 0
+      animSpeed: 0
+      canParry: 0
+      canBackStab: 0
+      parryMultiplier: 0
+      backstabMultiplier: 0
+      overideDamageAnim: 0
+      damageAnim: 
+      weaponStats:
+        physical: 0
+        strike: 0
+        slash: 0
+        thrust: 0
+        magic: 0
+        fire: 0
+        lighting: 0
+        dark: 0
+    two_handedActions: []
+    parryMultiplier: 0
+    backstabMultiplier: 0
+    LeftHandMirror: 0
+    modelPrefab: {fileID: 8708967274694803919, guid: 0ab7c3c10044fe34aa18551988ed8019, type: 3}
+    r_model_pos: {x: 0, y: 0, z: 0}
+    l_model_pos: {x: 0.007834826, y: 0.03291699, z: 0.00187959}
+    r_model_eulers: {x: 0, y: 0, z: 0}
+    l_model_eulers: {x: 342.31216, y: 324.7669, z: 250.46262}
+    model_scale: {x: 0.7, y: 0.7, z: 0.7}
+  - itemName: Pyromancy_Flame
+    itemDescription: 
+    icon: {fileID: 21300000, guid: 78be37d243906ec4c9528b12f8fbd79b, type: 3}
+    oh_idle: oh_idle
+    th_idle: th_idle
+    actions:
+    - input: 0
+      type: 0
+      spellClass: 0
+      targetAnim: oh_attack_1
+      mirror: 0
+      canBeParried: 0
+      changeSpeed: 0
+      animSpeed: 0
+      canParry: 0
+      canBackStab: 0
+      parryMultiplier: 0
+      backstabMultiplier: 0
+      overideDamageAnim: 0
+      damageAnim: 
+      weaponStats:
+        physical: 0
+        strike: 0
+        slash: 0
+        thrust: 0
+        magic: 0
+        fire: 0
+        lighting: 0
+        dark: 0
+    two_handedActions: []
+    parryMultiplier: 0
+    backstabMultiplier: 0
+    LeftHandMirror: 0
+    modelPrefab: {fileID: 3081104353670444843, guid: 6b4971fa7e07e19448cffb7f772ad2c1, type: 3}
+    r_model_pos: {x: 0.0217, y: 0.0242, z: -0.0261}
+    l_model_pos: {x: 0.0094, y: 0.0357, z: -0.0235}
+    r_model_eulers: {x: 1.473354, y: 57.28258, z: 125.8157}
+    l_model_eulers: {x: 15.55623, y: 174.6466, z: 267.7469}
+    model_scale: {x: 0.3937015, y: 0.3937018, z: 0.3937022}

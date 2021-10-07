@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public static class StaticStrings
@@ -40,5 +41,31 @@ public static class StaticStrings
     public static string damage1 = "damage_1";
     public static string damage2 = "damage_2";
     public static string damage3 = "damage_3";
+    public static string changeWeapon = "changeWeapon";
+    public static string emptyBoth = "Empty Both";
+    public static string emptyLeft = "empty_l";
+    public static string emptyRight = "empty_r";
+    public static string equipWeapon_oh = "equipWeapon_oh";
 
+
+    //other
+    public static string _l = "_l";
+    public static string _r = "_r";
+    public static string Pad_x = "Pad_X";
+    public static string Pad_y = "Pad_Y";
+    //Data
+
+    public static string itemFolder = "/Items/";
+
+    public static string SaveLocation()
+    {
+        string r = Application.streamingAssetsPath;
+        
+        if(!Directory.Exists(r))
+        {
+            Directory.CreateDirectory(r);
+        }
+
+        return r;
+    }
 }

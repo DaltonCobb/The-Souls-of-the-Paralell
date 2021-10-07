@@ -164,7 +164,7 @@ public class EnemyStates : MonoBehaviour
                 anim.Play(tA);
             }
         }
-        Debug.Log("Damage is " + damage + " Poise is " + characterStats.poise);
+        //Debug.Log("Damage is " + damage + " Poise is " + characterStats.poise);
 
         isInvicible = true;
         anim.applyRootMotion = true;
@@ -191,17 +191,19 @@ public class EnemyStates : MonoBehaviour
         return;
     }
 
-    public void IsGettingParried()
+    public void IsGettingParried(Action a)
     {
-        health -= 500;
+        int damage = StatsCalculations.CalculateBaseDamage(a.weaponStats, characterStats, a.parryMultiplier);
+        health -= damage;
         dontDoAnything = true;
         anim.SetBool(StaticStrings.canMove, false);
         anim.Play(StaticStrings.parry_received);
     }
 
-    public void IsGettingBackstabbed()
+    public void IsGettingBackstabbed(Action a)
     {
-        health -= 500;
+        int damage = StatsCalculations.CalculateBaseDamage(a.weaponStats, characterStats, a.backstabMultiplier);
+        health -= damage;
         dontDoAnything = true;
         anim.SetBool(StaticStrings.canMove, false);
         anim.Play(StaticStrings.backstabbed);

@@ -18,6 +18,19 @@ public class InputController : MonoBehaviour
     float lt_axis;
     bool lt_input;
 
+    float d_y;
+    float d_x;
+    bool d_up;
+    bool d_down;
+    bool d_right;
+    bool d_left;
+
+    bool p_d_up;
+    bool p_d_down;
+    bool p_d_left;
+    bool p_d_right;
+
+
     bool leftAxis_down;
     bool rightAxis_down;
 
@@ -80,7 +93,14 @@ public class InputController : MonoBehaviour
 
         if (b_input)
             b_timer += delta;
-        
+
+        d_x = Input.GetAxis(StaticStrings.Pad_x);
+        d_y = Input.GetAxis(StaticStrings.Pad_y);
+
+        d_up = Input.GetKeyUp(KeyCode.Alpha1) || d_y > 0;
+        d_down = Input.GetKeyUp(KeyCode.Alpha2) || d_y < 0;
+        d_left = Input.GetKeyUp(KeyCode.Alpha3) || d_x < 0;
+        d_right = Input.GetKeyUp(KeyCode.Alpha4) || d_x > 0;
     }
 
     void UpdateStates()
@@ -149,12 +169,59 @@ public class InputController : MonoBehaviour
             camManager.lockonTransform = states.lockOnTransform;
             camManager.lockon = states.lockOn;
         }
+        HandleQuickSlotChanges();
     }
+    void HandleQuickSlotChanges()
+    {
+
+        if (d_up)
+        {
+            if (!p_d_up)
+            {
+                p_d_up = true;
+                states.inventoryManager.ChangeToNextSpell();
+            }
+        }
+        if (!d_up)
+            p_d_up = false;
+
+        if (!d_down)
+            p_d_down = false;
+
+        if (states.canMove == false)
+            return;
+        if (states.isTwoHanded)
+            return;
+
+        if (d_left)
+        {
+            if (!p_d_left)
+            {
+                states.inventoryManager.ChangeToNextWeapon(true);
+                p_d_left = true;
+            }
+
+        }
+        if (d_right)
+        {
+            if (!p_d_right)
+            {
+                states.inventoryManager.ChangeToNextWeapon(false);
+                p_d_right = true;
+
+            }
+        }
+       
+        if (!d_left)
+            p_d_left = false;
+        if (!d_right)
+            p_d_right = false;
+    }
+
     void ResetInputNStates()
     {
         if (b_input == false)
             b_timer = 0;
-
         if (states.rollInput)
             states.rollInput = false;
         if (states.run)

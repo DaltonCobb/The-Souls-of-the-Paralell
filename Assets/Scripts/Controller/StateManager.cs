@@ -273,6 +273,9 @@ public class StateManager : MonoBehaviour
 
     bool CheckForParry(Action slot)
     {
+        if (slot.canParry == false)
+            return false;
+
         EnemyStates parryTarget = null;
         Vector3 origin = transform.position;
         origin.y += 1;
@@ -289,11 +292,7 @@ public class StateManager : MonoBehaviour
         if (parryTarget.parriedBy == null)
             return false;
 
-      //  float dis = Vector3.Distance(parryTarget.transform.position, transform.position);
-
-        //if (dis > 3)
-          //  return false;
-
+      
         Vector3 dir = parryTarget.transform.position - transform.position;
         dir.Normalize();
         dir.y = 0;
@@ -313,7 +312,7 @@ public class StateManager : MonoBehaviour
 
             parryTarget.transform.rotation = eRotation;
             transform.rotation = ourRot;
-            parryTarget.IsGettingParried();
+            parryTarget.IsGettingParried(slot);
             canMove = false; 
             inAction = true;
             anim.SetBool(StaticStrings.mirror, slot.mirror);
@@ -355,7 +354,7 @@ public class StateManager : MonoBehaviour
             transform.position = targetPosition;
 
             backstab.transform.rotation = transform.rotation;
-            backstab.IsGettingBackstabbed();
+            backstab.IsGettingBackstabbed(slot);
             canMove = false;
             inAction = true;
             anim.SetBool(StaticStrings.mirror, slot.mirror);
@@ -410,19 +409,6 @@ public class StateManager : MonoBehaviour
         float h = horizontal;
         v = (moveAmount > 0.3f) ? 1 : 0;
         h = 0;
-
-        //if (lockOn == false)
-        //{
-        //    v = (moveAmount > 0.3f) ? 1 : 0;
-        //    h = 0;
-        //}
-        //else
-        //{
-        //    if (Mathf.Abs(v) < 0.3f)
-        //        v = 0;
-        //    if (Mathf.Abs(h) < 0.3f)
-        //        h = 0;
-        //}
 
         if (v != 0)
         {
@@ -484,12 +470,52 @@ public class StateManager : MonoBehaviour
 
     public void HandleTwoHanded()
     {
-        anim.SetBool(StaticStrings.two_handed, isTwoHanded);
+        bool isRight = true;
+        Weapon w = inventoryManager.rightHandWeapon.instance;
+        if (w == null)
+        {
+             w = inventoryManager.leftHandWeapon.instance;
+             isRight = false;
+        }
+        if (w == null)
+            return;
 
         if (isTwoHanded)
+        {
+            anim.CrossFade(w.th_idle, .2f);
             actionManager.UpdateActionTwoHanded();
+
+
+            if(isRight)
+            {
+                if (inventoryManager.leftHandWeapon)
+                    inventoryManager.leftHandWeapon.weaponModel.SetActive(false);
+            }
+            else
+            {
+                if (inventoryManager.rightHandWeapon)
+                    inventoryManager.rightHandWeapon.weaponModel.SetActive(false);
+            }
+        }
         else
+        {
+            string targetAnim = w.oh_idle;
+            targetAnim += (isRight) ? StaticStrings._r : StaticStrings._l;
+            // anim.CrossFade(targetAnim, .2f);
+            anim.Play(StaticStrings.equipWeapon_oh);
             actionManager.UpdateActionOneHanded();
+
+            if (isRight)
+            {
+                if (inventoryManager.leftHandWeapon)
+                    inventoryManager.leftHandWeapon.weaponModel.SetActive(true);
+            }
+            else
+            {
+                if (inventoryManager.rightHandWeapon)
+                    inventoryManager.rightHandWeapon.weaponModel.SetActive(true);
+            }
+        }
     }
 
     public void IsGettingParried()

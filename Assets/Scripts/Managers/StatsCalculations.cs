@@ -4,25 +4,25 @@ using UnityEngine;
 
 public static class StatsCalculations 
 {
-    public static int CalculateBaseDamage(WeaponStats w, CharacterStats st)
+    public static int CalculateBaseDamage(WeaponStats w, CharacterStats st, float multiplier = 1)
     {
-        int physical = w.physical - st.physical;
-        int strike = w.strike - st.vs_strike;
-        int slash = w.slash - st.vs_slash;
-        int thrust = w.thrust - st.vs_thrust;
+        float physical = (w.physical * multiplier) - st.physical;
+        float strike = (w.strike * multiplier) - st.vs_strike;
+        float slash = ( w.slash * multiplier) - st.vs_slash;
+        float thrust = (w.thrust * multiplier) - st.vs_thrust;
 
-        int sum = physical + strike + slash + thrust;
+        float sum = physical + strike + slash + thrust;
 
-        int magic = w.magic - st.magic;
-        int fire = w.fire - st.fire;
-        int lighting = w.lighting - st.lighting;
-        int dark = w.dark - st.dark;
+        float magic = (w.magic * multiplier) - st.magic;
+        float fire = (w.fire * multiplier) - st.fire;
+        float lighting = (w.lighting * multiplier) - st.lighting;
+        float dark = (w.dark * multiplier) - st.dark;
 
         sum += magic + fire + lighting + dark;
 
         if (sum <= 0)
             sum = 1;
 
-        return sum;
+        return Mathf.RoundToInt(sum);
     }
 }

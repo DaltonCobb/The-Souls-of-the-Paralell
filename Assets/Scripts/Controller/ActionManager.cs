@@ -20,63 +20,29 @@ public class ActionManager : MonoBehaviour
     {
         EmptyAllSlots();
 
-        DeepCopyAction(states.inventoryManager.rightHandWeapon, ActionInput.rb, ActionInput.rb);
-        DeepCopyAction(states.inventoryManager.rightHandWeapon, ActionInput.rt, ActionInput.rt);
+        StaticFunctions.DeepCopyAction(states.inventoryManager.rightHandWeapon.instance, ActionInput.rb, ActionInput.rb, actionSlots);
+        StaticFunctions.DeepCopyAction(states.inventoryManager.rightHandWeapon.instance, ActionInput.rt, ActionInput.rt, actionSlots);
 
         if (states.inventoryManager.hasLeftHandWeapon)
         {
-            DeepCopyAction(states.inventoryManager.leftHandWeapon, ActionInput.rb, ActionInput.lb, true);
-            DeepCopyAction(states.inventoryManager.leftHandWeapon, ActionInput.rt, ActionInput.lt, true);
+            StaticFunctions.DeepCopyAction(states.inventoryManager.leftHandWeapon.instance, ActionInput.rb, ActionInput.lb, actionSlots,true);
+            StaticFunctions.DeepCopyAction(states.inventoryManager.leftHandWeapon.instance, ActionInput.rt, ActionInput.lt, actionSlots,true);
         }
         else
         {
-            DeepCopyAction(states.inventoryManager.rightHandWeapon, ActionInput.lb, ActionInput.lb);
-            DeepCopyAction(states.inventoryManager.rightHandWeapon, ActionInput.lt, ActionInput.lt);
+            StaticFunctions.DeepCopyAction(states.inventoryManager.rightHandWeapon.instance, ActionInput.lb, ActionInput.lb, actionSlots);
+            StaticFunctions.DeepCopyAction(states.inventoryManager.rightHandWeapon.instance, ActionInput.lt, ActionInput.lt, actionSlots);
         }
-    }
-
-    public void DeepCopyAction(Weapon w, ActionInput inp, ActionInput assign, bool isLeftHand = false)
-    {
-        Action a = GetAction(assign);
-        Action w_a = w.GetAction(w.actions, inp);
-        if (w_a == null)
-            return;
-
-        a.targetAnim = w_a.targetAnim;
-        a.type = w_a.type;
-        a.canBeParried = w_a.canBeParried;
-        a.changeSpeed = w_a.changeSpeed;
-        a.animSpeed = w_a.animSpeed;
-        a.canBackStab = w_a.canBackStab;
-
-        if(isLeftHand)
-        {
-            a.mirror = true;
-        }
-        DeepCopyWeaponStats(w_a.weaponStats, a.weaponStats);
-    }
-
-    public void DeepCopyWeaponStats(WeaponStats from, WeaponStats to)
-    {
-        to.physical = from.physical;
-        to.slash = from.slash;
-        to.strike = from.strike;
-        to.thrust = from.thrust;
-        to.magic = from.magic;
-        to.lighting = from.lighting;
-        to.fire = from.fire;
-        to.dark = from.dark;
-
     }
 
     public void UpdateActionTwoHanded()
     {
         EmptyAllSlots();
-        Weapon w = states.inventoryManager.rightHandWeapon;
+        Weapon w = states.inventoryManager.rightHandWeapon.instance;
 
         for (int i = 0; i < w.two_handedActions.Count; i++)
         {
-            Action a = GetAction(w.two_handedActions[i].input);
+            Action a = StaticFunctions.GetAction(w.two_handedActions[i].input, actionSlots);
             a.targetAnim = w.two_handedActions[i].targetAnim;
             a.type = w.two_handedActions[i].type;
         }
@@ -86,7 +52,7 @@ public class ActionManager : MonoBehaviour
     {
         for(int i = 0; i < 4; i++)
         {
-            Action a = GetAction((ActionInput)i);
+            Action a = StaticFunctions.GetAction((ActionInput)i, actionSlots);
             a.targetAnim = null;
             a.mirror = false;
             a.type = ActionType.attack;
@@ -107,19 +73,9 @@ public class ActionManager : MonoBehaviour
     public Action GetActionSlot(StateManager st)
     {
         ActionInput a_input = GetActionInput(st);
-        return GetAction(a_input);
+        return StaticFunctions.GetAction(a_input, actionSlots);
     }
-    Action GetAction(ActionInput inp)
-    {
-
-        for(int i = 0; i < actionSlots.Count; i++)
-        {
-            if (actionSlots[i].input == inp)
-                return actionSlots[i];
-        }
-        return null;
-    }
-
+    
     public ActionInput GetActionInput(StateManager st)
     {
         if (st.rb)
@@ -150,22 +106,39 @@ public enum ActionType
     attack,block,spells,parry
 }
 
+public enum SpellClass
+{
+    pyromancy, miracles, sorcery
+}
+
+public enum SpellType
+{
+    projectile, buff, looping
+}
 [System.Serializable]
 public class Action
 {
     public ActionInput input;
     public ActionType type;
+    public SpellClass spellClass;
     public string targetAnim;
     public bool mirror = false;
     public bool canBeParried = true;
     public bool changeSpeed = false;
     public float animSpeed = 1;
+    public bool canParry = false;
     public bool canBackStab = false;
+
+    [HideInInspector]
+    public float parryMultiplier;
+    [HideInInspector]
+    public float backstabMultiplier;
 
     public bool overideDamageAnim;
     public string damageAnim;
 
     public WeaponStats weaponStats;
+    
 }
 
 [System.Serializable]
