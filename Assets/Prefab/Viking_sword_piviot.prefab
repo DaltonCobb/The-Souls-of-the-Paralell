@@ -1,19 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &7141262088395775866
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8060235902075501426}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c792230a4b834d44b261e894050f4d4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  damageCollider:
-  - {fileID: 7141262088658672238}
 --- !u!1 &7141262088658672238
 GameObject:
   m_ObjectHideFlags: 0
@@ -102,6 +88,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7141262088395775866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8060235902075501426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c792230a4b834d44b261e894050f4d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damageCollider:
+  - {fileID: 7141262088658672238}
 --- !u!1001 &7141262090110649891
 PrefabInstance:
   m_ObjectHideFlags: 0

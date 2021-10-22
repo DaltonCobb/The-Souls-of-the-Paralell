@@ -29,28 +29,46 @@ MonoBehaviour:
       animSpeed: 0
       canParry: 0
       canBackStab: 0
+      staminaCost: 20
+      focusCost: 0
       parryMultiplier: 0
       backstabMultiplier: 0
       overideDamageAnim: 0
       damageAnim: 
-      weaponStats:
-        physical: 0
-        strike: 0
-        slash: 0
-        thrust: 0
-        magic: 0
-        fire: 0
-        lighting: 0
-        dark: 0
+    - input: 2
+      type: 0
+      spellClass: 0
+      targetAnim: oh_attack_3
+      mirror: 0
+      canBeParried: 0
+      changeSpeed: 0
+      animSpeed: 0
+      canParry: 0
+      canBackStab: 0
+      staminaCost: 5
+      focusCost: 0
+      parryMultiplier: 0
+      backstabMultiplier: 0
+      overideDamageAnim: 0
+      damageAnim: 
     two_handedActions: []
     parryMultiplier: 0
     backstabMultiplier: 0
     LeftHandMirror: 1
     modelPrefab: {fileID: 7530080860619478933, guid: 8a5917f4d98be0c4eb4b1c7b18f12caf, type: 3}
+    weaponStats:
+      physical: 0
+      strike: 0
+      slash: 0
+      thrust: 0
+      magic: 0
+      fire: 0
+      lighting: 0
+      dark: 0
     r_model_pos: {x: 0, y: 0, z: 0}
     l_model_pos: {x: 0, y: 0, z: 0}
     r_model_eulers: {x: 0, y: 0, z: 0}
-    l_model_eulers: {x: 0, y: 0, z: 0}
+    l_model_eulers: {x: -0.01, y: -0.01, z: -0.01}
     model_scale: {x: 1, y: 1, z: 1}
   - itemName: Round Shield
     itemDescription: 
@@ -61,31 +79,49 @@ MonoBehaviour:
     - input: 0
       type: 1
       spellClass: 0
-      targetAnim: 
+      targetAnim: shield
       mirror: 0
       canBeParried: 0
       changeSpeed: 0
       animSpeed: 0
       canParry: 0
       canBackStab: 0
+      staminaCost: 5
+      focusCost: 0
       parryMultiplier: 0
       backstabMultiplier: 0
       overideDamageAnim: 0
       damageAnim: 
-      weaponStats:
-        physical: 0
-        strike: 0
-        slash: 0
-        thrust: 0
-        magic: 0
-        fire: 0
-        lighting: 0
-        dark: 0
+    - input: 2
+      type: 3
+      spellClass: 0
+      targetAnim: parry
+      mirror: 0
+      canBeParried: 0
+      changeSpeed: 0
+      animSpeed: 0
+      canParry: 0
+      canBackStab: 0
+      staminaCost: 5
+      focusCost: 0
+      parryMultiplier: 0
+      backstabMultiplier: 0
+      overideDamageAnim: 0
+      damageAnim: 
     two_handedActions: []
     parryMultiplier: 0
     backstabMultiplier: 0
-    LeftHandMirror: 0
+    LeftHandMirror: 1
     modelPrefab: {fileID: 8708967274694803919, guid: 0ab7c3c10044fe34aa18551988ed8019, type: 3}
+    weaponStats:
+      physical: 0
+      strike: 0
+      slash: 0
+      thrust: 0
+      magic: 0
+      fire: 0
+      lighting: 0
+      dark: 0
     r_model_pos: {x: 0, y: 0, z: 0}
     l_model_pos: {x: 0.007834826, y: 0.03291699, z: 0.00187959}
     r_model_eulers: {x: 0, y: 0, z: 0}
@@ -98,35 +134,37 @@ MonoBehaviour:
     th_idle: th_idle
     actions:
     - input: 0
-      type: 0
+      type: 2
       spellClass: 0
-      targetAnim: oh_attack_1
+      targetAnim: 
       mirror: 0
       canBeParried: 0
       changeSpeed: 0
       animSpeed: 0
       canParry: 0
       canBackStab: 0
+      staminaCost: 5
+      focusCost: 0
       parryMultiplier: 0
       backstabMultiplier: 0
       overideDamageAnim: 0
       damageAnim: 
-      weaponStats:
-        physical: 0
-        strike: 0
-        slash: 0
-        thrust: 0
-        magic: 0
-        fire: 0
-        lighting: 0
-        dark: 0
     two_handedActions: []
     parryMultiplier: 0
     backstabMultiplier: 0
-    LeftHandMirror: 0
+    LeftHandMirror: 1
     modelPrefab: {fileID: 3081104353670444843, guid: 6b4971fa7e07e19448cffb7f772ad2c1, type: 3}
-    r_model_pos: {x: 0.0217, y: 0.0242, z: -0.0261}
-    l_model_pos: {x: 0.0094, y: 0.0357, z: -0.0235}
-    r_model_eulers: {x: 1.473354, y: 57.28258, z: 125.8157}
-    l_model_eulers: {x: 15.55623, y: 174.6466, z: 267.7469}
-    model_scale: {x: 0.3937015, y: 0.3937018, z: 0.3937022}
+    weaponStats:
+      physical: 0
+      strike: 0
+      slash: 0
+      thrust: 0
+      magic: 0
+      fire: 0
+      lighting: 0
+      dark: 0
+    r_model_pos: {x: 0, y: 0, z: 0}
+    l_model_pos: {x: 0, y: 0, z: 0}
+    r_model_eulers: {x: 0, y: 0, z: 0}
+    l_model_eulers: {x: 0, y: 0, z: 0}
+    model_scale: {x: 1, y: 1, z: 1}

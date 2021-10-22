@@ -21,6 +21,8 @@ public class InventoryManager : MonoBehaviour
     public RuntimeWeapon leftHandWeapon;
 
     public GameObject parryCollider;
+    public GameObject breathCollider;
+    public GameObject blockCollider;
 
     StateManager states;
     public void Init(StateManager st)
@@ -32,6 +34,8 @@ public class InventoryManager : MonoBehaviour
         ParryCollider pr = parryCollider.GetComponent<ParryCollider>();
         pr.InitPlayer(st);
         CloseParryCollider();
+        CloseBreathCollider();
+        CloseBlockCollider();
     }
 
     public void LoadInventory()
@@ -69,17 +73,10 @@ public class InventoryManager : MonoBehaviour
             hasLeftHandWeapon = true;
         }
 
-         hasLeftHandWeapon = (leftHandWeapon != null);
-
         for(int i=0; i < spell_items.Count; i++)
         {
             SpellToRuntimeSpell(ResourceManager.singleton.GetSpell(spell_items[i]));
         }
-
-        //if (spell_items.Count > 0)
-        //{
-        //    currentSpell = SpellToRuntimeSpell(ResourceManager.singleton.GetSpell(spell_items[0]));
-        //}
 
         if (r_spells.Count > 0)
         {
@@ -134,7 +131,6 @@ public class InventoryManager : MonoBehaviour
         currentSpell = spell;
 
         QuickSlot uiSlot = QuickSlot.singleton;
-       // Debug.Log(spell.instance);
         uiSlot.UpdateSlot(QSlotType.spell, spell.instance.icon);
     }
     public Weapon GetCurrentWeapon(bool isLeft)
@@ -180,7 +176,7 @@ public class InventoryManager : MonoBehaviour
        parryCollider.SetActive(true);
     }
 
-    public RuntimeSpellItems SpellToRuntimeSpell(Spell s)
+    public RuntimeSpellItems SpellToRuntimeSpell(Spell s, bool isLeft = false)
     {
         GameObject go = new GameObject();
         RuntimeSpellItems inst = go.AddComponent<RuntimeSpellItems>();
@@ -188,8 +184,35 @@ public class InventoryManager : MonoBehaviour
         StaticFunctions.DeepCopySpell(s, inst.instance);
         go.name = s.itemName;
 
+        
+
         r_spells.Add(inst);
         return inst;
+    }
+
+    public void CreateSpellParticle(RuntimeSpellItems inst, bool isLeft, bool parentUnderRoot =  false)
+    {
+        if(inst.currentParticle == null)
+        {
+            inst.currentParticle = Instantiate(inst.instance.particlePrefab) as GameObject;
+            inst.p_hook = inst.currentParticle.GetComponentInChildren<ParticleHook>();
+            inst.p_hook.Init();
+        }
+
+        if(!parentUnderRoot)
+        {
+            Transform p = states.anim.GetBoneTransform((isLeft) ? HumanBodyBones.LeftHand : HumanBodyBones.RightHand);
+            inst.currentParticle.transform.parent = p;
+            inst.currentParticle.transform.localRotation = Quaternion.identity;
+            inst.currentParticle.transform.localPosition = Vector3.zero;
+        }
+        else
+        {
+            inst.currentParticle.transform.parent = transform;
+            inst.currentParticle.transform.localRotation = Quaternion.identity;
+            inst.currentParticle.transform.localPosition = new Vector3(0, 1.5f, .9f);
+        }
+
     }
 
     public RuntimeWeapon WeaponToRuntimeWeapon(Weapon w, bool isLeft = false)
@@ -253,6 +276,7 @@ public class InventoryManager : MonoBehaviour
         states.actionManager.UpdateActionOneHanded();
     }
 
+    #region Delegate Calls
     public void ChangeToNextSpell()
     {
         if (s_index < r_spells.Count - 1)
@@ -262,6 +286,32 @@ public class InventoryManager : MonoBehaviour
 
         EquipSpell(r_spells[s_index]);
     }
+
+    public void OpenBreathCollider()
+    {
+        breathCollider.SetActive(true);
+    }
+
+    public void CloseBreathCollider()
+    {
+        breathCollider.SetActive(false);
+    }
+
+    public void OpenBlockCollider()
+    {
+        blockCollider.SetActive(true);
+    }
+
+    public void CloseBlockCollider()
+    {
+        blockCollider.SetActive(false);
+    }
+
+    public void EmitSpellParticle()
+    {
+        currentSpell.p_hook.Emit(1);
+    }
+    #endregion
 }
 [System.Serializable]
 public class Item
@@ -285,30 +335,54 @@ public class Weapon : Item
     public bool LeftHandMirror;
 
     public GameObject modelPrefab;
-    public Action GetAction(List<Action> l, ActionInput inp)
-    {
-        for(int i = 0; i < l.Count; i++)
-        {
-            if(l[i].input == inp)
-            {
-                return l[i];
-            }    
-        }
-        return null;
-    }
+
+    public WeaponStats weaponStats;
 
     public Vector3 r_model_pos;
     public Vector3 l_model_pos;
     public Vector3 r_model_eulers;
     public Vector3 l_model_eulers;
     public Vector3 model_scale;
+
+    public Action GetAction(List<Action> l, ActionInput inp)
+    {
+        if (l == null)
+            return null;
+
+        for (int i = 0; i < l.Count; i++)
+        {
+            if (l[i].input == inp)
+            {
+                return l[i];
+            }
+        }
+        return null;
+    }
 }
 
 [System.Serializable]
 public class Spell : Item
 {
     public SpellType spellType;
+    public SpellClass spellClass;
+    public List<SpellAction> actions = new List<SpellAction>();
     public GameObject projectile;
     public GameObject particlePrefab;
+    public string spell_effect;
+
+    public SpellAction GetAction(List<SpellAction> l, ActionInput inp)
+    {
+        if (l == null)
+            return null;
+
+        for (int i = 0; i < l.Count; i++)
+        {
+            if (l[i].input == inp)
+            {
+                return l[i];
+            }
+        }
+        return null;
+    }
 }
 

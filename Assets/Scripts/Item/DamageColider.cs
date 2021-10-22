@@ -17,6 +17,6 @@ public class DamageColider : MonoBehaviour
         if (eStates == null)
             return;
 
-        eStates.DoDamage(states.currentAtcion);
+        eStates.DoDamage(states.currentAtcion, states.inventoryManager.GetCurrentWeapon(states.currentAtcion.mirror));
     }
 }

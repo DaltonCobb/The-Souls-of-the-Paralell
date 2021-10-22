@@ -128,6 +128,8 @@ public class Action
     public float animSpeed = 1;
     public bool canParry = false;
     public bool canBackStab = false;
+    public float staminaCost = 5;
+    public int focusCost = 0;
 
     [HideInInspector]
     public float parryMultiplier;
@@ -136,10 +138,18 @@ public class Action
 
     public bool overideDamageAnim;
     public string damageAnim;
-
-    public WeaponStats weaponStats;
-    
 }
+
+
+[System.Serializable]
+public class SpellAction
+{
+    public ActionInput input;
+    public string targetAnim;
+    public string throwAnim;
+    public float castTime;
+}
+
 
 [System.Serializable]
 public class ItemAction

@@ -5,6 +5,12 @@ using UnityEngine;
 [System.Serializable]
 public class CharacterStats
 {
+    [Header("Current")]
+    public float _health;
+    public float _focus;
+    public float _stamina;
+
+
     [Header("Base Power")]
     public int hp = 100;
     public int fp = 100;
@@ -39,6 +45,32 @@ public class CharacterStats
 
     public int attunementSlots = 0;
 
+
+    public void InitCurrent()
+    {
+        if (statEffects != null)
+        {
+            statEffects();
+        }
+
+        _health = hp;
+        _focus = fp;
+        _stamina = stamina;
+
+    }
+
+    public delegate void StatEffects();
+    public StatEffects statEffects;
+
+    public void AddHealth()
+    {
+        hp += 5;
+    }
+
+    public void RemoveHealth()
+    {
+        hp -= 5;
+    }
 }
 
 [System.Serializable]

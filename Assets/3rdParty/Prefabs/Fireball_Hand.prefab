@@ -4664,7 +4664,6 @@ ParticleSystemRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 9fb5e6407675c2d4d87cf27176fcd736, type: 2}
-  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -9382,7 +9381,6 @@ ParticleSystemRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: d8f4b48f25c2bb5479dae153f83e2db6, type: 2}
-  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -9437,6 +9435,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4561455109165772}
+  - component: {fileID: -8390444131885209678}
   m_Layer: 0
   m_Name: Fireball_Hand
   m_TagString: Untagged
@@ -9459,3 +9458,15 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-8390444131885209678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1819081214966656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f54ef8d2d6ecaf8478f65293e463232d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

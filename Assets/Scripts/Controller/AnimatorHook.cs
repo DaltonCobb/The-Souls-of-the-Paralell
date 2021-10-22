@@ -14,6 +14,18 @@ public class AnimatorHook : MonoBehaviour
     float roll_t;
     float delta;
     AnimationCurve roll_curve;
+
+    public Transform ikTarget;
+    public Transform bodyTarget;
+    public Transform headTarget;
+
+    public Transform ikTargetShield;
+    public Transform ikTargetBodyShield;
+
+    HandleIk ik_handler;
+    public bool useIk;
+    public AvatarIKGoal currentHand;
+
     public void Init(StateManager st, EnemyStates eSt)
     {
         states = st;
@@ -32,6 +44,10 @@ public class AnimatorHook : MonoBehaviour
             delta = eSt.delta;
         }
 
+
+        ik_handler = gameObject.GetComponent<HandleIk>();
+        if (ik_handler != null)
+            ik_handler.Init(anim);
     }
 
     public void InitForRoll()
@@ -52,6 +68,11 @@ public class AnimatorHook : MonoBehaviour
 
     private void OnAnimatorMove()
     {
+        if (ik_handler != null)
+        {
+            ik_handler.OnAnimatorMoveTick(currentHand == AvatarIKGoal.LeftHand);
+        }
+
         if (states == null && eStates == null)
             return;
 
@@ -100,6 +121,35 @@ public class AnimatorHook : MonoBehaviour
             Vector3 v2 = (relative * rm_multi); // states.delta;
             rigid.velocity = v2;
         }
+    }
+
+    void OnAnimatorIk()
+    {
+        if (ik_handler == null)
+            return;
+
+        if (!useIk)
+        {
+            if(ik_handler.weight > 0)
+            {
+                ik_handler.IKTick(currentHand, 0);
+            }
+            else
+            {
+                ik_handler.weight = 0;
+            }
+        }
+        else
+        {
+           ik_handler.IKTick(currentHand , 1);
+        }
+
+    }
+
+    private void LateUpdate()
+    {
+        if (ik_handler != null)
+            ik_handler.LateTick();
     }
 
     public void OpenDamageColliders()
@@ -162,5 +212,32 @@ public class AnimatorHook : MonoBehaviour
         {
             eStates.parryIsOn = false;
         }
+    }
+
+    public void CloseParticle()
+    {
+        if(states)
+        {
+            if (states.inventoryManager.currentSpell.currentParticle != null)
+                states.inventoryManager.currentSpell.currentParticle.SetActive(false);
+        }    
+    }
+
+    public void InitiateThrowForProjectile()
+    {
+        if(states)
+        {
+            states.ThrowProjectile();
+        }
+    }
+
+    public void InitIKForShield(bool isLeft)
+    {
+        ik_handler.UpdateIKTargets((isLeft)? IKSnapshotType.shield_l : IKSnapshotType.shield_r, isLeft);
+    }
+
+    public void InitIKForBreathSpell(bool isLeft)
+    {
+        ik_handler.UpdateIKTargets(IKSnapshotType.breath, isLeft);
     }
 }

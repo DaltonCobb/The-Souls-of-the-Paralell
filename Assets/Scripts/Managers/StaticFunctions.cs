@@ -15,7 +15,6 @@ public static class StaticFunctions
         for(int i = 0; i < from.actions.Count; i++)
         {
             Action a = new Action();
-            a.weaponStats = new WeaponStats();
             DeepCopyActionToAction(a, from.actions[i]);
             to.actions.Add(a);
         }
@@ -25,7 +24,6 @@ public static class StaticFunctions
         for (int i = 0; i < from.two_handedActions.Count; i++)
         {
             Action a = new Action();
-            a.weaponStats = new WeaponStats();
             DeepCopyActionToAction(a, from.two_handedActions[i]);
             to.two_handedActions.Add(a);
         }
@@ -39,6 +37,8 @@ public static class StaticFunctions
         to.r_model_pos = from.r_model_pos;
         to.model_scale = from.model_scale;
 
+        to.weaponStats = new WeaponStats();
+        DeepCopyWeaponStats(from.weaponStats, to.weaponStats);
     }
     public static void DeepCopyActionToAction(Action a, Action w_a)
     {
@@ -54,7 +54,6 @@ public static class StaticFunctions
         a.overideDamageAnim = w_a.overideDamageAnim;
         a.damageAnim = w_a.damageAnim;
 
-        DeepCopyWeaponStats(w_a.weaponStats, a.weaponStats);
     }
 
 
@@ -81,7 +80,6 @@ public static class StaticFunctions
         {
             a.mirror = true;
         }
-        DeepCopyWeaponStats(w_a.weaponStats, a.weaponStats);
     }
 
     public static void DeepCopyWeaponStats(WeaponStats from, WeaponStats to)
@@ -113,7 +111,27 @@ public static class StaticFunctions
         to.itemDescription = from.itemDescription;
         to.icon = from.icon;
         to.spellType = from.spellType;
+        to.spellClass = from.spellClass;
         to.projectile = from.projectile;
+        to.spell_effect = from.spell_effect;
         to.particlePrefab = from.particlePrefab;
+
+        to.actions = new List<SpellAction>();
+       for(int i =0; i < from.actions.Count; i++)
+        {
+            SpellAction a = new SpellAction();
+            DeepCopySpellAction(a, from.actions[i]);
+            to.actions.Add(a);
+        }
+
+    }
+
+    public static void DeepCopySpellAction(SpellAction to, SpellAction from)
+    {
+        to.input = from.input;
+        to.targetAnim = from.targetAnim;
+        to.throwAnim = from.throwAnim;
+        to.castTime = from.castTime;
+
     }
 }
