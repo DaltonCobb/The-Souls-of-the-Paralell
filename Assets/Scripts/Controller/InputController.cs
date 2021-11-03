@@ -196,7 +196,7 @@ public class InputController : MonoBehaviour
         if (!d_down)
             p_d_down = false;
 
-        if (states.canMove == false)
+        if (states.onEmpty == false)
             return;
         if (states.isTwoHanded)
             return;

@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class ActionManager : MonoBehaviour
 {
+    public int actionIndex;
     public List<Action> actionSlots = new List<Action>();
-
     public ItemAction consumableItem;
-
     StateManager states;
     public void Init(StateManager st)
     {
@@ -44,6 +43,7 @@ public class ActionManager : MonoBehaviour
         {
             Action a = StaticFunctions.GetAction(w.two_handedActions[i].input, actionSlots);
             a.targetAnim = w.two_handedActions[i].targetAnim;
+            StaticFunctions.DeepCopyStepsList(w.two_handedActions[i], a);
             a.type = w.two_handedActions[i].type;
         }
     }
@@ -53,7 +53,7 @@ public class ActionManager : MonoBehaviour
         for(int i = 0; i < 4; i++)
         {
             Action a = StaticFunctions.GetAction((ActionInput)i, actionSlots);
-            a.targetAnim = null;
+            a.steps = null;
             a.mirror = false;
             a.type = ActionType.attack;
         }
@@ -76,6 +76,11 @@ public class ActionManager : MonoBehaviour
         return StaticFunctions.GetAction(a_input, actionSlots);
     }
     
+    public Action GetActionFromInput(ActionInput a_input)
+    {
+        return StaticFunctions.GetAction(a_input, actionSlots);
+    }
+
     public ActionInput GetActionInput(StateManager st)
     {
         if (st.rb)
@@ -122,6 +127,8 @@ public class Action
     public ActionType type;
     public SpellClass spellClass;
     public string targetAnim;
+    [NonReorderable]
+    public List<ActionSteps> steps;
     public bool mirror = false;
     public bool canBeParried = true;
     public bool changeSpeed = false;
@@ -130,6 +137,33 @@ public class Action
     public bool canBackStab = false;
     public float staminaCost = 5;
     public int focusCost = 0;
+
+    public ActionSteps GetActionStep(ref int indx)
+    {
+        if(steps == null || steps.Count == 0)
+        {
+            ActionSteps defaultStep = new ActionSteps();
+            defaultStep.branches = new List<ActionAnim>();
+            ActionAnim aa = new ActionAnim();
+            aa.input = input;
+            aa.targetAnim = targetAnim;
+            defaultStep.branches.Add(aa);
+
+            return defaultStep;
+        }
+
+        if (indx > steps.Count - 1)
+            indx = 0;
+
+        ActionSteps retVal = steps[indx];
+
+        if (indx > steps.Count - 1)
+            indx = 0;
+        else
+            indx++;
+
+        return retVal;
+    }
 
     [HideInInspector]
     public float parryMultiplier;
@@ -140,6 +174,31 @@ public class Action
     public string damageAnim;
 }
 
+[System.Serializable]
+public class ActionSteps
+{
+    [NonReorderable]
+    public List<ActionAnim> branches = new List<ActionAnim>();
+
+    public ActionAnim GetBranch(ActionInput inp)
+    {
+        for(int i =0; i <branches.Count;i++)
+        {
+            if (branches[i].input == inp)
+                return branches[i];
+        }
+
+        return branches[0];
+    }
+}
+
+
+[System.Serializable]
+public class ActionAnim
+{
+    public ActionInput input;
+    public string targetAnim;
+}
 
 [System.Serializable]
 public class SpellAction
@@ -148,6 +207,8 @@ public class SpellAction
     public string targetAnim;
     public string throwAnim;
     public float castTime;
+    public float focusCost;
+    public float staminaCost;
 }
 
 

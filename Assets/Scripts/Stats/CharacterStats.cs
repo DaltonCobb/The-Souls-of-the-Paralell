@@ -92,6 +92,7 @@ public class Attributes
 [System.Serializable]
 public class WeaponStats
 {
+    public string weaponid;
     public int physical;
     public int strike;
     public int slash;

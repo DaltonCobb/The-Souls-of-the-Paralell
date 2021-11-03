@@ -22,14 +22,18 @@ MonoBehaviour:
     - input: 0
       type: 0
       spellClass: 0
-      targetAnim: oh_attack_1
+      targetAnim: 
+      steps:
+      - branches:
+        - input: 0
+          targetAnim: oh_attack_1
       mirror: 0
-      canBeParried: 0
+      canBeParried: 1
       changeSpeed: 0
       animSpeed: 0
-      canParry: 0
-      canBackStab: 0
-      staminaCost: 20
+      canParry: 1
+      canBackStab: 1
+      staminaCost: 30
       focusCost: 0
       parryMultiplier: 0
       backstabMultiplier: 0
@@ -38,7 +42,8 @@ MonoBehaviour:
     - input: 2
       type: 0
       spellClass: 0
-      targetAnim: oh_attack_3
+      targetAnim: oh_attack_2
+      steps: []
       mirror: 0
       canBeParried: 0
       changeSpeed: 0
@@ -51,25 +56,202 @@ MonoBehaviour:
       backstabMultiplier: 0
       overideDamageAnim: 0
       damageAnim: 
-    two_handedActions: []
+    two_handedActions:
+    - input: 2
+      type: 0
+      spellClass: 0
+      targetAnim: th_attack_1
+      steps:
+      - branches:
+        - input: 0
+          targetAnim: th_attack_1
+        - input: 2
+          targetAnim: th_attack_2
+      mirror: 0
+      canBeParried: 1
+      changeSpeed: 1
+      animSpeed: 0
+      canParry: 1
+      canBackStab: 1
+      staminaCost: 0
+      focusCost: 0
+      parryMultiplier: 0
+      backstabMultiplier: 0
+      overideDamageAnim: 0
+      damageAnim: 
+    - input: 1
+      type: 0
+      spellClass: 0
+      targetAnim: 
+      steps:
+      - branches:
+        - input: 1
+          targetAnim: th_attack_1
+        - input: 3
+          targetAnim: th_attack_2
+      mirror: 0
+      canBeParried: 1
+      changeSpeed: 1
+      animSpeed: 0
+      canParry: 1
+      canBackStab: 1
+      staminaCost: 0
+      focusCost: 0
+      parryMultiplier: 0
+      backstabMultiplier: 0
+      overideDamageAnim: 0
+      damageAnim: 
     parryMultiplier: 0
     backstabMultiplier: 0
     LeftHandMirror: 1
     modelPrefab: {fileID: 7530080860619478933, guid: 8a5917f4d98be0c4eb4b1c7b18f12caf, type: 3}
-    weaponStats:
-      physical: 0
-      strike: 0
-      slash: 0
-      thrust: 0
-      magic: 0
-      fire: 0
-      lighting: 0
-      dark: 0
-    r_model_pos: {x: 0, y: 0, z: 0}
-    l_model_pos: {x: 0, y: 0, z: 0}
-    r_model_eulers: {x: 0, y: 0, z: 0}
-    l_model_eulers: {x: -0.01, y: -0.01, z: -0.01}
+    r_model_pos: {x: 0.0069, y: 0.0338, z: 0.0095}
+    l_model_pos: {x: -0.006, y: 0.048, z: -0.002}
+    r_model_eulers: {x: -0, y: 0, z: 0}
+    l_model_eulers: {x: 331.1476, y: 286.1495, z: 141.67203}
     model_scale: {x: 1, y: 1, z: 1}
+  - itemName: sword_3
+    itemDescription: 
+    icon: {fileID: 21300000, guid: b4741f45a7a1f264898f40ba92328a71, type: 3}
+    oh_idle: oh_idle
+    th_idle: th_idle
+    actions:
+    - input: 0
+      type: 0
+      spellClass: 0
+      targetAnim: 
+      steps:
+      - branches:
+        - input: 0
+          targetAnim: rap_oh_attack_1
+        - input: 2
+          targetAnim: rap_oh_attack_2
+      - branches:
+        - input: 2
+          targetAnim: rap_oh_attack_2
+        - input: 2
+          targetAnim: rap_oh_attack_3
+      mirror: 0
+      canBeParried: 1
+      changeSpeed: 0
+      animSpeed: 0
+      canParry: 1
+      canBackStab: 1
+      staminaCost: 20
+      focusCost: 0
+      parryMultiplier: 0
+      backstabMultiplier: 0
+      overideDamageAnim: 0
+      damageAnim: 
+    two_handedActions: []
+    parryMultiplier: 0
+    backstabMultiplier: 0
+    LeftHandMirror: 1
+    modelPrefab: {fileID: 9113612600912626534, guid: a8e85a907af63c6428e6cd4ca55faa6d, type: 3}
+    r_model_pos: {x: -0.0134, y: -0.2574, z: -0.1046}
+    l_model_pos: {x: 0.1764, y: 0.2317, z: 0.1203}
+    r_model_eulers: {x: -10.541, y: 129.301, z: 72.139}
+    l_model_eulers: {x: -2.957, y: 145.57, z: -76.287}
+    model_scale: {x: 0.3000001, y: 0.3, z: 0.30000007}
+  - itemName: zweihander
+    itemDescription: 
+    icon: {fileID: 21300000, guid: 64a200a4c4c38764d81bdb4bf0e024b0, type: 3}
+    oh_idle: gs_oh_idle
+    th_idle: gs_th_idle
+    actions:
+    - input: 0
+      type: 0
+      spellClass: 0
+      targetAnim: gs_oh_attack_1
+      steps: []
+      mirror: 0
+      canBeParried: 1
+      changeSpeed: 0
+      animSpeed: 0
+      canParry: 1
+      canBackStab: 1
+      staminaCost: 20
+      focusCost: 0
+      parryMultiplier: 0
+      backstabMultiplier: 0
+      overideDamageAnim: 0
+      damageAnim: 
+    - input: 2
+      type: 0
+      spellClass: 0
+      targetAnim: 
+      steps:
+      - branches:
+        - input: 2
+          targetAnim: gs_th_to_pose
+        - input: 0
+          targetAnim: gs_attack_from_pose
+      mirror: 0
+      canBeParried: 1
+      changeSpeed: 0
+      animSpeed: 0
+      canParry: 1
+      canBackStab: 1
+      staminaCost: 5
+      focusCost: 0
+      parryMultiplier: 0
+      backstabMultiplier: 0
+      overideDamageAnim: 0
+      damageAnim: 
+    two_handedActions:
+    - input: 0
+      type: 0
+      spellClass: 0
+      targetAnim: 
+      steps:
+      - branches:
+        - input: 0
+          targetAnim: gs_attack_from_pose
+        - input: 2
+          targetAnim: gs_th_attack_1
+      mirror: 0
+      canBeParried: 1
+      changeSpeed: 1
+      animSpeed: 0
+      canParry: 1
+      canBackStab: 1
+      staminaCost: 0
+      focusCost: 0
+      parryMultiplier: 0
+      backstabMultiplier: 0
+      overideDamageAnim: 0
+      damageAnim: 
+    - input: 1
+      type: 0
+      spellClass: 0
+      targetAnim: 
+      steps:
+      - branches:
+        - input: 1
+          targetAnim: gs_th_to_pose
+        - input: 3
+          targetAnim: gs_attack_from_pose
+      mirror: 0
+      canBeParried: 0
+      changeSpeed: 0
+      animSpeed: 0
+      canParry: 0
+      canBackStab: 0
+      staminaCost: 0
+      focusCost: 0
+      parryMultiplier: 0
+      backstabMultiplier: 0
+      overideDamageAnim: 0
+      damageAnim: 
+    parryMultiplier: 0
+    backstabMultiplier: 0
+    LeftHandMirror: 1
+    modelPrefab: {fileID: 3430362711667640402, guid: 50d4e0c81890fb142b32e5625b27c112, type: 3}
+    r_model_pos: {x: 0.0173, y: 0.0345, z: -0.0023}
+    l_model_pos: {x: 0.001, y: 0.033, z: -0.018}
+    r_model_eulers: {x: 31.244919, y: 352.51593, z: 326.49112}
+    l_model_eulers: {x: 315.17407, y: 321.36914, z: 88.50261}
+    model_scale: {x: 0.49999985, y: 0.49999976, z: 0.5000001}
   - itemName: Round Shield
     itemDescription: 
     icon: {fileID: 21300000, guid: 7eb80c482538ae344a9238963ae31cd4, type: 3}
@@ -80,6 +262,7 @@ MonoBehaviour:
       type: 1
       spellClass: 0
       targetAnim: shield
+      steps: []
       mirror: 0
       canBeParried: 0
       changeSpeed: 0
@@ -96,6 +279,7 @@ MonoBehaviour:
       type: 3
       spellClass: 0
       targetAnim: parry
+      steps: []
       mirror: 0
       canBeParried: 0
       changeSpeed: 0
@@ -113,15 +297,6 @@ MonoBehaviour:
     backstabMultiplier: 0
     LeftHandMirror: 1
     modelPrefab: {fileID: 8708967274694803919, guid: 0ab7c3c10044fe34aa18551988ed8019, type: 3}
-    weaponStats:
-      physical: 0
-      strike: 0
-      slash: 0
-      thrust: 0
-      magic: 0
-      fire: 0
-      lighting: 0
-      dark: 0
     r_model_pos: {x: 0, y: 0, z: 0}
     l_model_pos: {x: 0.007834826, y: 0.03291699, z: 0.00187959}
     r_model_eulers: {x: 0, y: 0, z: 0}
@@ -137,14 +312,15 @@ MonoBehaviour:
       type: 2
       spellClass: 0
       targetAnim: 
+      steps: []
       mirror: 0
       canBeParried: 0
       changeSpeed: 0
       animSpeed: 0
       canParry: 0
       canBackStab: 0
-      staminaCost: 5
-      focusCost: 0
+      staminaCost: 0
+      focusCost: 65
       parryMultiplier: 0
       backstabMultiplier: 0
       overideDamageAnim: 0
@@ -154,17 +330,27 @@ MonoBehaviour:
     backstabMultiplier: 0
     LeftHandMirror: 1
     modelPrefab: {fileID: 3081104353670444843, guid: 6b4971fa7e07e19448cffb7f772ad2c1, type: 3}
-    weaponStats:
-      physical: 0
-      strike: 0
-      slash: 0
-      thrust: 0
-      magic: 0
-      fire: 0
-      lighting: 0
-      dark: 0
     r_model_pos: {x: 0, y: 0, z: 0}
     l_model_pos: {x: 0, y: 0, z: 0}
     r_model_eulers: {x: 0, y: 0, z: 0}
     l_model_eulers: {x: 0, y: 0, z: 0}
     model_scale: {x: 1, y: 1, z: 1}
+  weaponStats:
+  - weaponid: sword
+    physical: 0
+    strike: 0
+    slash: 0
+    thrust: 0
+    magic: 0
+    fire: 0
+    lighting: 0
+    dark: 0
+  - weaponid: zweihander
+    physical: 50
+    strike: 0
+    slash: 0
+    thrust: 0
+    magic: 0
+    fire: 0
+    lighting: 0
+    dark: 0

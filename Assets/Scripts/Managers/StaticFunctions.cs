@@ -37,8 +37,6 @@ public static class StaticFunctions
         to.r_model_pos = from.r_model_pos;
         to.model_scale = from.model_scale;
 
-        to.weaponStats = new WeaponStats();
-        DeepCopyWeaponStats(from.weaponStats, to.weaponStats);
     }
     public static void DeepCopyActionToAction(Action a, Action w_a)
     {
@@ -54,6 +52,32 @@ public static class StaticFunctions
         a.overideDamageAnim = w_a.overideDamageAnim;
         a.damageAnim = w_a.damageAnim;
 
+        DeepCopyStepsList(w_a, a);
+    }
+
+    public static void DeepCopyStepsList(Action from, Action to)
+    {
+        to.steps = new List<ActionSteps>();
+
+        for(int i=0; i< from.steps.Count; i++)
+        {
+            ActionSteps step = new ActionSteps();
+            DeepCopyStep(from.steps[i], step);
+            to.steps.Add(step);
+            
+        }
+    }
+    public static void DeepCopyStep(ActionSteps from, ActionSteps to)
+    {
+        to.branches = new List<ActionAnim>();
+
+        for(int i = 0; i < from.branches.Count; i++)
+        {
+            ActionAnim a = new ActionAnim();
+            a.input = from.branches[i].input;
+            a.targetAnim = from.branches[i].targetAnim;
+            to.branches.Add(a);
+        }
     }
 
 
@@ -64,6 +88,7 @@ public static class StaticFunctions
         if (w_a == null)
             return;
 
+        DeepCopyStepsList(w_a, a);
         a.targetAnim = w_a.targetAnim;
         a.type = w_a.type;
         a.spellClass = w_a.spellClass;
@@ -84,6 +109,12 @@ public static class StaticFunctions
 
     public static void DeepCopyWeaponStats(WeaponStats from, WeaponStats to)
     {
+        if(from == null)
+        {
+            Debug.Log(to.weaponid + "weapon stats werent found, assinging everything as zero");
+        }
+
+        to.weaponid = from.weaponid;
         to.physical = from.physical;
         to.slash = from.slash;
         to.strike = from.strike;
@@ -132,6 +163,7 @@ public static class StaticFunctions
         to.targetAnim = from.targetAnim;
         to.throwAnim = from.throwAnim;
         to.castTime = from.castTime;
-
+        to.staminaCost = from.staminaCost;
+        to.focusCost = from.focusCost;
     }
 }

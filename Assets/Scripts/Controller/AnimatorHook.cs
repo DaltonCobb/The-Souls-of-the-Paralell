@@ -26,6 +26,8 @@ public class AnimatorHook : MonoBehaviour
     public bool useIk;
     public AvatarIKGoal currentHand;
 
+    public bool killDelta; 
+
     public void Init(StateManager st, EnemyStates eSt)
     {
         states = st;
@@ -81,7 +83,7 @@ public class AnimatorHook : MonoBehaviour
 
         if (states != null)
         {
-            if (states.canMove)
+            if (states.onEmpty)
                 return;
 
             delta = states.delta;
@@ -101,8 +103,13 @@ public class AnimatorHook : MonoBehaviour
         if (rolling == false)
         {
             Vector3 delta2 = anim.deltaPosition;
-            delta2.y = 0;
+            if(killDelta)
+            {
+                killDelta = false;
+                delta2 = Vector3.zero;
+            }
             Vector3 v = (delta2 * rm_multi) / delta;
+            //v += Physics.gravity;
             rigid.velocity = v;
         }
         else
@@ -119,10 +126,12 @@ public class AnimatorHook : MonoBehaviour
             Vector3 v1 = Vector3.forward * zValue;
             Vector3 relative = transform.TransformDirection(v1);
             Vector3 v2 = (relative * rm_multi); // states.delta;
+           // v2 += Physics.gravity;
             rigid.velocity = v2;
         }
     }
 
+  
     void OnAnimatorIk()
     {
         if (ik_handler == null)
@@ -152,10 +161,30 @@ public class AnimatorHook : MonoBehaviour
             ik_handler.LateTick();
     }
 
+    public void OpenAttack()
+    {
+        if(states)
+        {
+            states.canAttack = true;
+        }
+
+      //  Debug.Log("can attack");
+    }
+
+    public void OpenCanMove()
+    {
+        if(states)
+        {
+            states.canMove = true;
+        }
+
+        //Debug.Log("can move");
+    }
     public void OpenDamageColliders()
     {
         if (states)
         {
+            states.damageIsOn = true;
             states.inventoryManager.OpenAllDamageColliders();
         }
         OpenParryFlag();
@@ -165,7 +194,9 @@ public class AnimatorHook : MonoBehaviour
     {
         if (states)
         {
-          states.inventoryManager.CloseAllDamageColliders();
+           states.damageIsOn = false;
+           states.inventoryManager.CloseAllDamageColliders();
+
         }
         CloseParryFlag();
     }
@@ -239,5 +270,20 @@ public class AnimatorHook : MonoBehaviour
     public void InitIKForBreathSpell(bool isLeft)
     {
         ik_handler.UpdateIKTargets(IKSnapshotType.breath, isLeft);
+    }
+
+    public void OpenRotationControl()
+    {
+        if(states)
+        {
+            states.canRotate = true;
+        }
+    }
+    public void CloseRotationControl()
+    {
+        if(states)
+        {
+            states.canRotate = false;
+        }
     }
 }

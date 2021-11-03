@@ -23,6 +23,8 @@ MonoBehaviour:
       targetAnim: fireball_start
       throwAnim: throw
       castTime: 1
+      focusCost: 50
+      staminaCost: 5
     projectile: {fileID: 6067087556868233694, guid: d6b8c163fcbb0a0488dd2a621ff6b1c7, type: 3}
     particlePrefab: {fileID: 1819081214966656, guid: 87fdac22fe7b4a64d8128de76e547c9f, type: 3}
     spell_effect: fireball
@@ -36,6 +38,8 @@ MonoBehaviour:
       targetAnim: hold_spell_start
       throwAnim: 
       castTime: 0
+      focusCost: 0
+      staminaCost: 0
     projectile: {fileID: 0}
     particlePrefab: {fileID: 1237154358593698, guid: 4e42daf05f807ba4f8acde7517715f2a, type: 3}
     spell_effect: firebreath
@@ -49,6 +53,8 @@ MonoBehaviour:
       targetAnim: hold_spell_start
       throwAnim: 
       castTime: 0
+      focusCost: 0
+      staminaCost: 0
     projectile: {fileID: 0}
     particlePrefab: {fileID: 1497246781728562, guid: b308c1b3468b3d34c922b1a2f1cca492, type: 3}
     spell_effect: darkshield

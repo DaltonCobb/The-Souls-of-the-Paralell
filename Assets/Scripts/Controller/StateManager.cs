@@ -35,6 +35,9 @@ public class StateManager : MonoBehaviour
     public bool lockOn;
     public bool inAction;
     public bool canMove;
+    public bool damageIsOn;
+    public bool canRotate;
+    public bool canAttack;
     public bool isSpellcasting;
     public bool enableIK;
     public bool isTwoHanded;
@@ -43,6 +46,7 @@ public class StateManager : MonoBehaviour
     public bool parryIsOn;
     public bool isBlocking;
     public bool isLeftHand;
+    public bool onEmpty;
 
 
     [Header("Other")]
@@ -69,6 +73,11 @@ public class StateManager : MonoBehaviour
 
     [HideInInspector]
     public Action currentAtcion;
+
+    [HideInInspector]
+    public float airTimer;
+    public ActionInput storePrevAction;
+    public ActionInput storeActionInput;
 
     float _actionDelay;
 
@@ -129,19 +138,12 @@ public class StateManager : MonoBehaviour
         isBlocking = false;
         usingItem = anim.GetBool(StaticStrings.interacting);
         anim.SetBool(StaticStrings.spellcasting, isSpellcasting);
-        DetectAction();
-        DetectItemAction();
         inventoryManager.rightHandWeapon.weaponModel.SetActive(!usingItem);
-
-        anim.SetBool(StaticStrings.blocking, isBlocking);
-        anim.SetBool(StaticStrings.isLeft, isLeftHand);
-
+   
         if (isBlocking == false && isSpellcasting == false)
         {
            enableIK = false;
         }
-
-        a_hook.useIk = enableIK;
 
         if (inAction)
         {
@@ -157,15 +159,43 @@ public class StateManager : MonoBehaviour
             {
                 return;
             }
-
-            return;
         }
 
-        canMove = anim.GetBool("canMove");
+        onEmpty = anim.GetBool(StaticStrings.onEmpty);
 
-        if (!canMove)
+        if(onEmpty)
+        {
+            canAttack = true;
+            canMove = true;
+        }
+
+        if(canRotate)
+        {
+            HandleRotation();
+        }
+
+        if (!onEmpty && !canMove && !canAttack)// Animation is playing
             return;
 
+        if(canMove && !onEmpty)
+        {
+            if (moveAmount > 0.3f)
+            {
+                anim.CrossFade("Empty Override", 0.1f);
+                onEmpty = true;
+            }
+        }
+
+
+        if (canAttack)
+        {
+            DetectAction();
+        }
+        if(!canMove)
+        {
+            DetectItemAction();
+
+        }
 
         anim.applyRootMotion = false;
 
@@ -180,7 +210,7 @@ public class StateManager : MonoBehaviour
         if (run)
             targetSpeed = runSpeed;
 
-        if(onGround)
+        if(onGround && canMove)
             rigid.velocity = moveDir * (targetSpeed * moveAmount);
 
         if (run)
@@ -195,16 +225,31 @@ public class StateManager : MonoBehaviour
         else
             HandleLockOnAnimations(moveDir);
 
+
+        a_hook.useIk = enableIK;
+        // anim.SetBool(StaticStrings.blocking, isBlocking);
+        anim.SetBool(StaticStrings.isLeft, isLeftHand);
+
+        HandleBlocking();
+
         if (isSpellcasting)
         {
             HandleSpellcasting();
             return;
         }
 
+
         a_hook.CloseRoll();
         HandleRolls();
     }
     
+    public bool IsInput()
+    {
+        if (rt || rb || lt || rollInput)
+            return true;
+
+        return false;
+    }
     void HandleRotation()
     {
         Vector3 targetDir = (lockOn == false) ? moveDir : (lockOnTransform != null) ?
@@ -220,7 +265,7 @@ public class StateManager : MonoBehaviour
 
     public void DetectItemAction()
     {
-        if (canMove == false || usingItem || isBlocking)
+        if (onEmpty == false || usingItem || isBlocking)
             return;
         if (itemInput == false)
             return;
@@ -238,14 +283,24 @@ public class StateManager : MonoBehaviour
 
     public void DetectAction()
     {
-        if (canMove == false || usingItem || isSpellcasting)
+        if (canAttack == false && (onEmpty == false || usingItem || isSpellcasting))
             return;
 
         if (rb == false && rt == false && lt == false && lb == false)
             return;
 
+        ActionInput targetInput = actionManager.GetActionInput(this);
+        storeActionInput = targetInput;
+        if (onEmpty == false)
+        {
+            a_hook.killDelta = true;
+            targetInput = storePrevAction;
 
-        Action slot = actionManager.GetActionSlot(this);
+        }
+
+        storePrevAction = targetInput;
+        Action slot = actionManager.GetActionFromInput(targetInput);
+
         if (slot == null)
             return;
         switch(slot.type)
@@ -279,13 +334,16 @@ public class StateManager : MonoBehaviour
             return;
 
         string targetAnim = null;
-        targetAnim = slot.targetAnim;
+        targetAnim = slot.GetActionStep(ref actionManager.actionIndex).GetBranch(storeActionInput).targetAnim;
 
         if (string.IsNullOrEmpty(targetAnim))
             return;
 
 
         currentAtcion = slot;
+
+        canAttack = false;
+        onEmpty = false;
         canMove = false;
         inAction = true;
 
@@ -300,7 +358,185 @@ public class StateManager : MonoBehaviour
         anim.SetFloat(StaticStrings.animSpeed, targetSpeed);
         anim.SetBool(StaticStrings.mirror, slot.mirror);
         anim.CrossFade(targetAnim, 0.2f);
+        //anim.Play(targetAnim);
+
         characterStats._stamina -= slot.staminaCost;
+    }
+
+
+    void SpellAction(Action slot)
+    {
+
+        if (characterStats._stamina < slot.staminaCost)
+            return;
+
+        if(slot.spellClass != inventoryManager.currentSpell.instance.spellClass || characterStats._focus < slot.focusCost)
+        {
+            anim.SetBool(StaticStrings.mirror, slot.mirror);
+            anim.CrossFade("cant_spell", 0.2f);
+            canAttack = false;
+            canMove = false;
+            inAction = true;
+            return;
+        }
+
+        ActionInput inp = actionManager.GetActionInput(this);
+        if (inp == ActionInput.lb)
+            inp = ActionInput.rb;
+        if (inp == ActionInput.lt)
+            inp = ActionInput.rt;
+
+        Spell s_inst = inventoryManager.currentSpell.instance;
+        SpellAction s_slot = inventoryManager.currentSpell.instance.GetAction(s_inst.actions, inp);
+        if (s_slot == null)
+        {
+            Debug.Log("Cant find spell slot");
+            return;
+        }
+
+        SpellEffectsManager.singleton.UseSpellEffect(s_inst.spell_effect, this);
+
+        isSpellcasting = true;
+        spellcastTime = 0;
+        max_spellCastTime = s_slot.castTime;
+        spellTargetAnim = s_slot.throwAnim;
+        spellIsMirrored = slot.mirror;
+        curSpellType = s_inst.spellType;
+
+        string targetAnim = s_slot.targetAnim;
+        if (spellIsMirrored)
+            targetAnim += StaticStrings._l;
+        else
+            targetAnim += StaticStrings._r;
+
+        projectileCanidate = inventoryManager.currentSpell.instance.projectile;
+        inventoryManager.CreateSpellParticle(inventoryManager.currentSpell, spellIsMirrored, (s_inst.spellType == SpellType.looping));
+        anim.SetBool(StaticStrings.spellcasting, true);
+        anim.SetBool(StaticStrings.mirror, slot.mirror);
+        anim.CrossFade(targetAnim, 0.2f);
+
+        cur_focusCost = s_slot.focusCost;
+        cur_stamCost = s_slot.staminaCost;
+  
+        a_hook.InitIKForBreathSpell(spellIsMirrored);
+
+        if (spellCast_start != null)
+            spellCast_start();
+    }
+
+
+    float cur_focusCost;
+    float cur_stamCost;
+    float spellcastTime;
+    float max_spellCastTime;
+    string spellTargetAnim;
+    bool spellIsMirrored;
+    SpellType curSpellType;
+    GameObject projectileCanidate;
+
+    public delegate void SpellCast_Start();
+    public delegate void SpellCast_Loop();
+    public delegate void SpellCast_Stop();
+    public SpellCast_Start spellCast_start;
+    public SpellCast_Loop spellCast_loop;
+    public SpellCast_Stop spellCast_stop;
+
+    void EmptySpellCastDelegates()
+    {
+        spellCast_start = null;
+        spellCast_loop = null;
+        spellCast_stop = null;
+    }
+
+    void HandleSpellcasting()
+    {
+        if(curSpellType == SpellType.looping)
+        {
+            enableIK = true;
+            a_hook.currentHand = (spellIsMirrored) ? AvatarIKGoal.LeftHand : AvatarIKGoal.RightHand;
+
+            if((rb == false && lb == false) || characterStats._focus < 2)
+            {
+                isSpellcasting = false;
+                enableIK = false;
+
+                inventoryManager.breathCollider.SetActive(false);
+                inventoryManager.blockCollider.SetActive(false);
+
+                if (spellCast_stop != null)
+                    spellCast_stop();
+
+                EmptySpellCastDelegates();
+
+                return;
+            }
+
+
+            if (spellCast_loop != null)
+                spellCast_loop();
+
+            characterStats._focus -= 0.5f;
+
+            return;
+        }
+
+        spellcastTime += delta;
+
+        if(inventoryManager.currentSpell.currentParticle != null)
+            inventoryManager.currentSpell.currentParticle.SetActive(true);
+
+        if(spellcastTime > max_spellCastTime)
+        {
+            onEmpty = false;
+            canMove = false;
+            canAttack = false;
+            inAction = true;
+            isSpellcasting = false;
+
+            string targetAnim = spellTargetAnim;
+            anim.SetBool(StaticStrings.mirror, spellIsMirrored);
+            anim.CrossFade(targetAnim, 0.2f);
+        }
+    }
+
+
+    bool blockAnim;
+    string block_idle_anim;
+    void HandleBlocking()
+    {
+
+        if (isBlocking == false)
+        {
+            if (blockAnim)
+            {
+                anim.CrossFade(block_idle_anim, 0.1f);
+                blockAnim = false;
+            }
+        }
+        else
+        {
+
+        }
+    }
+
+    public void ThrowProjectile()
+    {
+        if (projectileCanidate == null)
+            return;
+        GameObject go = Instantiate(projectileCanidate) as GameObject;
+        Transform p = anim.GetBoneTransform((spellIsMirrored) ? HumanBodyBones.LeftHand : HumanBodyBones.RightHand);
+        go.transform.position = p.position;
+
+        if (lockOnTransform && lockOn)
+            go.transform.LookAt(lockOnTransform.position);
+        else
+            go.transform.rotation = transform.rotation;
+
+        Projecile proj = go.GetComponent<Projecile>();
+        proj.Init();
+
+        characterStats._stamina -= cur_stamCost;
+        characterStats._focus -= cur_focusCost;
     }
 
     bool CheckForParry(Action slot)
@@ -346,7 +582,9 @@ public class StateManager : MonoBehaviour
             transform.rotation = ourRot;
             parryTarget.IsGettingParried(slot, inventoryManager.GetCurrentWeapon(slot.mirror));
 
-            canMove = false; 
+            onEmpty = false;
+            canMove = false;
+            canAttack = false;
             inAction = true;
 
             anim.SetBool(StaticStrings.mirror, slot.mirror);
@@ -357,141 +595,6 @@ public class StateManager : MonoBehaviour
 
         return false;
     }
-
-    void SpellAction(Action slot)
-    {
-
-        if(slot.spellClass != inventoryManager.currentSpell.instance.spellClass ||characterStats._stamina < slot.staminaCost || characterStats._focus < slot.focusCost)
-        {
-            anim.SetBool(StaticStrings.mirror, slot.mirror);
-            anim.CrossFade("cant_spell", 0.2f);
-            canMove = false;
-            inAction = true;
-            return;
-        }
-
-        ActionInput inp = actionManager.GetActionInput(this);
-        if (inp == ActionInput.lb)
-            inp = ActionInput.rb;
-        if (inp == ActionInput.lt)
-            inp = ActionInput.rt;
-
-        Spell s_inst = inventoryManager.currentSpell.instance;
-        SpellAction s_slot = inventoryManager.currentSpell.instance.GetAction(s_inst.actions, inp);
-        if (s_slot == null)
-        {
-            Debug.Log("Cant find spell slot");
-            return;
-        }
-
-        SpellEffectsManager.singleton.UseSpellEffect(s_inst.spell_effect, this);
-
-        isSpellcasting = true;
-        spellcastTime = 0;
-        max_spellCastTime = s_slot.castTime;
-        spellTargetAnim = s_slot.throwAnim;
-        spellIsMirrored = slot.mirror;
-        curSpellType = s_inst.spellType;
-
-        string targetAnim = s_slot.targetAnim;
-        if (spellIsMirrored)
-            targetAnim += StaticStrings._l;
-        else
-            targetAnim += StaticStrings._r;
-
-        projectileCanidate = inventoryManager.currentSpell.instance.projectile;
-        inventoryManager.CreateSpellParticle(inventoryManager.currentSpell, spellIsMirrored, (s_inst.spellType == SpellType.looping));
-        anim.SetBool(StaticStrings.spellcasting, true);
-        anim.SetBool(StaticStrings.mirror, slot.mirror);
-        anim.CrossFade(targetAnim, 0.2f);
-
-        characterStats._stamina -= slot.staminaCost;
-        characterStats._focus -= slot.focusCost;
-
-        a_hook.InitIKForBreathSpell(spellIsMirrored);
-
-        if (spellCast_start != null)
-            spellCast_start();
-    }
-
-    float spellcastTime;
-    float max_spellCastTime;
-    string spellTargetAnim;
-    bool spellIsMirrored;
-    SpellType curSpellType;
-    GameObject projectileCanidate;
-
-    public delegate void SpellCast_Start();
-    public delegate void SpellCast_Loop();
-    public delegate void SpellCast_Stop();
-    public SpellCast_Start spellCast_start;
-    public SpellCast_Loop spellCast_loop;
-    public SpellCast_Stop spellCast_stop;
-
-
-    void HandleSpellcasting()
-    {
-        if(curSpellType == SpellType.looping)
-        {
-
-            enableIK = true;
-            a_hook.currentHand = (spellIsMirrored) ? AvatarIKGoal.LeftHand : AvatarIKGoal.RightHand;
-
-            if((rb == false && lb == false) || characterStats._focus < 2)
-            {
-                isSpellcasting = false;
-
-                enableIK = false;
-
-                if (spellCast_stop != null)
-                    spellCast_stop();
-
-                return;
-            }
-
-
-            if (spellCast_loop != null)
-                spellCast_loop();
-
-            characterStats._focus -= 0.5f;
-
-            return;
-        }
-
-        spellcastTime += delta;
-
-        if(inventoryManager.currentSpell.currentParticle != null)
-            inventoryManager.currentSpell.currentParticle.SetActive(true);
-
-        if(spellcastTime > max_spellCastTime)
-        {
-            canMove = false;
-            inAction = true;
-            isSpellcasting = false;
-
-            string targetAnim = spellTargetAnim;
-            anim.SetBool(StaticStrings.mirror, spellIsMirrored);
-            anim.CrossFade(targetAnim, 0.2f);
-        }
-    }
-
-    public void ThrowProjectile()
-    {
-        if (projectileCanidate == null)
-            return;
-        GameObject go = Instantiate(projectileCanidate) as GameObject;
-        Transform p = anim.GetBoneTransform((spellIsMirrored) ? HumanBodyBones.LeftHand : HumanBodyBones.RightHand);
-        go.transform.position = p.position;
-
-        if (lockOnTransform && lockOn)
-            go.transform.LookAt(lockOnTransform.position);
-        else
-            go.transform.rotation = transform.rotation;
-
-        Projecile proj = go.GetComponent<Projecile>();
-        proj.Init();
-    }
-
     bool CheckForBackstab(Action slot)
     {
         if (slot.canBackStab == false)
@@ -523,7 +626,10 @@ public class StateManager : MonoBehaviour
 
             backstab.transform.rotation = transform.rotation;
             backstab.IsGettingBackstabbed(slot, inventoryManager.GetCurrentWeapon(slot.mirror));
+
+            onEmpty = false;
             canMove = false;
+            canAttack = false;
             inAction = true;
             anim.SetBool(StaticStrings.mirror, slot.mirror);
             anim.CrossFade(StaticStrings.parry_attack, 0.2f);
@@ -539,12 +645,25 @@ public class StateManager : MonoBehaviour
         isLeftHand = slot.mirror;
         a_hook.currentHand = (slot.mirror) ? AvatarIKGoal.LeftHand : AvatarIKGoal.RightHand;
         a_hook.InitIKForShield(slot.mirror);
+
+        if (blockAnim == false)
+        {
+            block_idle_anim = (isTwoHanded == false) ? inventoryManager.GetCurrentWeapon(isLeftHand).oh_idle : inventoryManager.GetCurrentWeapon(isLeftHand).th_idle;
+
+            block_idle_anim += (isLeftHand) ? "_l" : "_r";
+
+            string targetAnim = slot.targetAnim;
+            targetAnim += (isLeftHand) ? "_l" : "_r";
+            anim.CrossFade(targetAnim, 0.1f);
+            blockAnim = true;
+        }
+
     }
 
     void ParryAction(Action slot)
     {
         string targetAnim = null;
-        targetAnim = slot.targetAnim;
+        targetAnim = slot.GetActionStep(ref actionManager.actionIndex).GetBranch(storeActionInput).targetAnim;
 
         if (string.IsNullOrEmpty(targetAnim))
             return;
@@ -558,7 +677,11 @@ public class StateManager : MonoBehaviour
         }
 
         anim.SetFloat(StaticStrings.animSpeed, targetSpeed);
+        canBeParried = slot.canBeParried;
+
+        onEmpty = false;
         canMove = false;
+        canAttack = false;
         inAction = true;
         anim.SetBool(StaticStrings.mirror, slot.mirror);
         anim.CrossFade(targetAnim, 0.2f);
@@ -568,6 +691,11 @@ public class StateManager : MonoBehaviour
         delta = d;
         onGround = OnGround();
         anim.SetBool(StaticStrings.onGround, onGround);
+
+        if (!onGround)
+            airTimer += delta;
+        else
+            airTimer = 0;
     }
 
     void HandleRolls()
@@ -597,7 +725,9 @@ public class StateManager : MonoBehaviour
         anim.SetFloat(StaticStrings.vertical, v);
         anim.SetFloat(StaticStrings.horizontal, h);
 
+        onEmpty = false;
         canMove = false;
+        canAttack = false;
         inAction = true;
         anim.CrossFade(StaticStrings.Rolls, 0.2f);
 
@@ -673,7 +803,7 @@ public class StateManager : MonoBehaviour
         {
             string targetAnim = w.oh_idle;
             targetAnim += (isRight) ? StaticStrings._r : StaticStrings._l;
-            // anim.CrossFade(targetAnim, .2f);
+            anim.CrossFade(targetAnim, .2f);
             anim.Play(StaticStrings.equipWeapon_oh);
             actionManager.UpdateActionOneHanded();
 
@@ -718,5 +848,25 @@ public class StateManager : MonoBehaviour
         characterStats._focus = Mathf.Clamp(characterStats._focus, 0, characterStats.fp);
 
 
+    }
+
+   public  void SubstractStaminaOverTime()
+    {
+        characterStats._stamina -= cur_stamCost;
+    }
+
+    public void SubstractFocusOverTime()
+    {
+        characterStats._focus -= cur_focusCost;
+    }
+
+    public void AffectBlocking()
+    {
+        isBlocking = true;
+    }
+
+    public void StopAffectingBlocking()
+    {
+        isBlocking = false;
     }
 }

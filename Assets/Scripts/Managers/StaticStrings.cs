@@ -31,6 +31,7 @@ public static class StaticStrings
     public static string blocking = "blocking";
     public static string isLeft = "isLeft";
     public static string canMove = "canMove";
+    public static string onEmpty = "OnEmpty";
     public static string lockon = "lockon";
     public static string spellcasting = "spellcasting";
 

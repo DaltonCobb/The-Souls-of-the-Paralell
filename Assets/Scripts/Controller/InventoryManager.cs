@@ -224,6 +224,10 @@ public class InventoryManager : MonoBehaviour
         inst.instance = new Weapon();
         StaticFunctions.DeepCopyWeapon(w, inst.instance);
 
+        inst.weaponStats = new WeaponStats();
+        WeaponStats w_stats = ResourceManager.singleton.GetWeaponStats(w.itemName);
+        StaticFunctions.DeepCopyWeaponStats(w_stats, inst.weaponStats);
+
         inst.weaponModel = Instantiate(inst.instance.modelPrefab) as GameObject;
         Transform p = states.anim.GetBoneTransform((isLeft) ? HumanBodyBones.LeftHand : HumanBodyBones.RightHand);
         inst.weaponModel.transform.parent = p;
@@ -251,6 +255,9 @@ public class InventoryManager : MonoBehaviour
 
     public void ChangeToNextWeapon(bool isLeft)
     {
+        states.isTwoHanded = false;
+        states.HandleTwoHanded();
+
         if(isLeft)
         {
             if(l_index < r_l_weapons.Count -1)
@@ -335,8 +342,6 @@ public class Weapon : Item
     public bool LeftHandMirror;
 
     public GameObject modelPrefab;
-
-    public WeaponStats weaponStats;
 
     public Vector3 r_model_pos;
     public Vector3 l_model_pos;

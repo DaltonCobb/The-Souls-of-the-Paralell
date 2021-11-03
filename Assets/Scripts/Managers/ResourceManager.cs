@@ -6,6 +6,7 @@ public class ResourceManager : MonoBehaviour
 {
     Dictionary<string, int> spell_ids = new Dictionary<string, int>();
     Dictionary<string, int> weapon_ids = new Dictionary<string, int>();
+    Dictionary<string, int> weaponstats_ids = new Dictionary<string, int>();
     public static ResourceManager singleton;
     private void Awake()
     {
@@ -59,6 +60,18 @@ public class ResourceManager : MonoBehaviour
                 weapon_ids.Add(obj.weapons_all[i].itemName, i);
             }
         }
+
+        for (int i = 0; i < obj.weaponStats.Count; i++)
+        {
+            if (weaponstats_ids.ContainsKey(obj.weaponStats[i].weaponid))
+            {
+                Debug.Log(obj.weaponStats[i].weaponid + " is a duplicate");
+            }
+            else
+            {
+                weaponstats_ids.Add(obj.weaponStats[i].weaponid, i);
+            }
+        }
     }
 
     int GetWeaponIdFromString(string id)
@@ -86,6 +99,35 @@ public class ResourceManager : MonoBehaviour
             return null;
 
         return obj.weapons_all[index];
+    }
+
+    public WeaponStats GetWeaponStats(string id)
+    {
+        WeaponScriptableObject obj = Resources.Load("WeaponScriptableObject") as WeaponScriptableObject;
+
+        if (obj == null)
+        {
+            Debug.Log("WeaponScriptableObject cant be loaded");
+            return null;
+        }
+
+        int index = GetWeaponStatsIdFromString(id);
+
+        if (index == -1)
+            return null;
+
+        return obj.weaponStats[index];
+    }
+
+
+    int GetWeaponStatsIdFromString(string id)
+    {
+        int index = -1;
+        if (weaponstats_ids.TryGetValue(id, out index))
+        {
+            return index;
+        }
+        return index;
     }
 
     int GetSpellIdFromString(string id)
